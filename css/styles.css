@@ -1,0 +1,261 @@
+/* Paleta de colores rosa */
+:root {
+    --rosa-primario: #e83e8c;
+    --rosa-secundario: #ff85a2;
+    --rosa-oscuro: #c9184a;
+    --rosa-claro: #fff0f3;
+    --rosa-muy-claro: #fff9fa;
+}
+
+.badge-completo {
+    background-color: #E3F2FD;
+    color: #0D47A1;
+    border: 1px solid #90CAF9;
+}
+
+.badge-medio {
+    background-color: #FFF8E1;
+    color: #E65100;
+    border: 1px solid #FFD54F;
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* Estilos para los switches */
+.table td {
+    vertical-align: middle !important;
+}
+
+.form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.5em;
+    margin-left: 0;
+}
+
+/* Asegurar que los badges sean redondeados */
+.badge-completo,
+.badge-medio {
+    border-radius: 50rem !important;
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+}
+
+/* Clases de colores */
+.bg-rosa-primario {
+    background-color: var(--rosa-primario) !important;
+}
+
+.bg-rosa-secundario {
+    background-color: var(--rosa-secundario) !important;
+}
+
+.bg-rosa-oscuro {
+    background-color: var(--rosa-oscuro) !important;
+}
+
+.bg-rosa-claro {
+    background-color: var(--rosa-claro) !important;
+}
+
+.bg-rosa-muy-claro {
+    background-color: var(--rosa-muy-claro) !important;
+}
+
+.text-rosa-primario {
+    color: var(--rosa-primario) !important;
+}
+
+.text-rosa-oscuro {
+    color: var(--rosa-oscuro) !important;
+}
+
+/* Estilos personalizados */
+body {
+    background-color: var(--rosa-muy-claro);
+    color: #495057;
+}
+
+.table-rosa-claro {
+    background-color: var(--rosa-claro);
+}
+
+.table-bordered th {
+    border: 1px solid var(--rosa-oscuro) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--rosa-muy-claro) !important;
+}
+
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.btn {
+    border-radius: 20px;
+    padding: 8px 20px;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(232, 62, 140, 0.1);
+}
+
+/* Paginación personalizada */
+.page-link {
+    border: none;
+    margin: 0 5px;
+    border-radius: 20px !important;
+}
+
+.page-link:hover {
+    background-color: var(--rosa-secundario) !important;
+    color: white !important;
+}
+
+/* Estilo del checkbox */
+.form-check-input {
+    width: 1.2rem; /* Ajusta el tamaño */
+    height: 1.2rem;
+    background-color: var(--rosa-claro); /* Fondo inicial */
+    
+    border-radius: 0.25rem;
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+/* Cambiar el color cuando el checkbox está marcado */
+.form-check-input:checked {
+    background-color: var(--rosa-primario); /* Fondo rosa primario */
+    border-color: var(--rosa-secundario); /* Borde rosa secundario */
+    box-shadow: 0 0 5px rgba(232, 62, 140, 0.5); /* Efecto suave al marcar */
+}
+
+/* Cambiar el color al enfocar el checkbox */
+.form-check-input:focus {
+    outline: none; /* Eliminar el borde azul por defecto */
+    box-shadow: 0 0 5px rgba(255, 133, 162, 0.6); /* Rosa secundario */
+}
+
+.progress-tanda {
+    height: 20px;
+    background-color: #f0f0f0;
+}
+
+.progress-bar-tanda {
+    background-color: #4CAF50;
+    transition: width 0.6s ease;
+}
+
+.alert-pendiente {
+    background-color: #FFF3E0;
+    border-left: 4px solid #FFA000;
+    color: #E65100;
+}
+
+.alert-proximo {
+    background-color: #E8F5E9;
+    border-left: 4px solid #4CAF50;
+    color: #2E7D32;
+}
+
+/* Estilo para los badges */
+.badge-completo {
+    background-color: #28a745;
+    color: white;
+}
+.badge-medio {
+    background-color: #ffc107;
+    color: black;
+}
+
+/* Para mejorar la apariencia de los switches */
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+}
+
+/* Añade esto a tu archivo styles.css */
+.modal-backdrop {
+    z-index: 1040 !important; /* Asegura que esté por encima de otros elementos */
+}
+
+.modal {
+    z-index: 1050 !important;
+}
+
+/* Estilo para cuando el modal está en transición */
+.modal.fade.show {
+    display: block !important;
+    background-color: rgba(0,0,0,0.5);
+}
+
+
+
+
+/* Mejoras responsivas */
+@media (max-width: 768px) {
+    .card-body .row > .col-md-4 {
+        border-end: none !important;
+        border-bottom: 1px solid var(--rosa-secundario);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem;
+    }
+}
+
+/* Alert personalizado */
+.alert-rosa-secundario {
+    background-color: rgba(255, 133, 162, 0.2);
+    border-left: 4px solid var(--rosa-secundario);
+    color: #495057;
+}
+
+/* Modal personalizado */
+.modal-content {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+}
+
+/* Botones flotantes para móviles */
+.btn-floating {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 576px) {
+    .btn-floating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
