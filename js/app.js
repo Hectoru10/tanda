@@ -230,7 +230,7 @@ const tandaApp = {
 
                     // Crear fila HTML
                     const filaHTML = `
-                    <tr data-id="${doc.id}"
+                        <tr data-id="${doc.id}">
                         <td class="fw-bold">${data.numero}</td>
                         <td>${data.nombre}</td>
                         <td><span class="badge ${claseParticipacion} rounded-pill">${data.participacion}</span></td>
@@ -356,11 +356,7 @@ const tandaApp = {
 
                                         document.getElementById('editarParticipanteModal').setAttribute('data-id', id);
 
-                                        const modalEl = document.getElementById('editarParticipanteModal');
-                                        let modal = bootstrap.Modal.getInstance(modalEl);
-                                        if (!modal) {
-                                            modal = new bootstrap.Modal(modalEl);
-                                        }
+                                        const modal = new bootstrap.Modal(document.getElementById('editarParticipanteModal'));
                                         modal.show();
                                     }
                                 });
@@ -372,12 +368,85 @@ const tandaApp = {
 
 
 
+                // Dentro del objeto tandaApp, en la función loadParticipantes:
                 document.querySelectorAll('.btn-eliminar').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
-                        const id = btn.closest('tr').getAttribute('data-id');
-                        // Lógica para eliminar...
+                        const fila = btn.closest('tr');
+                        const id = fila.getAttribute('data-id');
+                        const nombre = fila.querySelector('td:nth-child(2)').textContent;
+
+                        // Guardar el ID y nombre en el modal
+                        const modalEl = document.getElementById('confirmarEliminarModal');
+                        modalEl.setAttribute('data-id', id);
+
+                        // Actualizar el mensaje con el nombre
+                        const mensaje = modalEl.querySelector('.modal-body p');
+                        mensaje.innerHTML = `¿Estás seguro de eliminar a <strong>${nombre}</strong>?<br>Esta acción no se puede deshacer.`;
+
+                        // Mostrar el modal correctamente
+                        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                        modal.show();
                     });
+                });
+
+                // Configurar el botón de confirmación (fuera del objeto tandaApp)
+                document.getElementById('btnConfirmarEliminar').addEventListener('click', function () {
+                    const modalEl = document.getElementById('confirmarEliminarModal');
+                    const id = modalEl.getAttribute('data-id');
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+
+                    // Mostrar loading
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
+                    btn.disabled = true;
+
+                    // Eliminar de Firebase
+                    db.collection("datos").doc(id).delete()
+                        .then(() => {
+                            // Cerrar modal correctamente
+                            const modal = bootstrap.Modal.getInstance(modalEl);
+                            modal.hide();
+
+                            // Limpiar y restaurar
+                            cleanUpModal('confirmarEliminarModal');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error("Error al eliminar:", error);
+                            alert('Error al eliminar participante: ' + error.message);
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        });
+                });
+
+                // Función auxiliar para limpiar modales (añadir al objeto tandaApp)
+                function cleanUpModal(modalId) {
+                    const modal = document.getElementById(modalId);
+                    modal.removeAttribute('data-id');
+
+                    // Limpiar backdrop si existe
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    if (backdrops.length > 0) {
+                        backdrops.forEach(backdrop => backdrop.remove());
+                    }
+
+                    // Restaurar el body
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+
+                    // Limpiar mensajes si es necesario
+                    if (modalId === 'confirmarEliminarModal') {
+                        const mensaje = modal.querySelector('.modal-body p');
+                        mensaje.innerHTML = 'Esta acción no se puede deshacer y se perderán todos los datos asociados.';
+                    }
+                }
+
+                // Añadir evento hidden.bs.modal al modal de confirmación
+                document.getElementById('confirmarEliminarModal').addEventListener('hidden.bs.modal', function () {
+                    cleanUpModal('confirmarEliminarModal');
                 });
             });
         });
@@ -514,6 +583,53 @@ document.getElementById('editarParticipanteModal').addEventListener('hidden.bs.m
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
+});
+
+document.getElementById('btnConfirmarEliminar').addEventListener('click', function () {
+    const id = document.getElementById('confirmarEliminarModal').getAttribute('data-id');
+    const btn = this;
+    const originalText = btn.innerHTML;
+
+    // Mostrar indicador de carga
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
+    btn.disabled = true;
+
+    // Eliminar el documento de Firebase
+    db.collection("datos").doc(id).delete()
+        .then(() => {
+            console.log("Participante eliminado correctamente");
+
+            // Cerrar el modal de confirmación
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminarModal'));
+            modal.hide();
+
+            // Limpiar el modal
+            document.getElementById('confirmarEliminarModal').removeAttribute('data-id');
+
+            // Restaurar el botón
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            // No es necesario recargar la página, Firestore actualizará automáticamente la tabla
+        })
+        .catch(error => {
+            console.error("Error al eliminar participante:", error);
+            alert('Error al eliminar participante: ' + error.message);
+
+            // Restaurar el botón
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+});
+
+document.getElementById('confirmarEliminarModal').addEventListener('hidden.bs.modal', function () {
+    // Limpiar el ID almacenado
+    this.removeAttribute('data-id');
+
+    // Restaurar el botón de confirmación
+    const btn = document.getElementById('btnConfirmarEliminar');
+    btn.innerHTML = '<i class="fas fa-trash-alt me-2"></i>Sí, Eliminar';
+    btn.disabled = false;
 });
 
 // Iniciar la aplicación cuando el DOM esté listo
