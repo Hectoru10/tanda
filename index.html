@@ -344,73 +344,73 @@
         </div>
     </div>
 
-    <!-- Modal Nuevo Participante -->
-    <div class="modal fade" id="nuevoParticipante" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-rosa-primario text-white">
-                    <h5 class="modal-title">
-                        <i class="fas fa-user-plus me-2"></i>Nuevo Participante
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formularioParticipantes">
-                        <!-- Número del participante -->
-                        <div class="mb-3">
-                            <label for="numero" class="form-label">
-                                <i class="fas fa-hashtag me-2 text-rosa-oscuro"></i>Número
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-rosa-claro">
-                                    <i class="fas fa-list-ol text-rosa-oscuro"></i>
-                                </span>
-                                <select class="form-select" id="numero" name="numero" required>
-                                    <option value="" disabled selected>Selecciona un número</option>
-                                    <!-- Opciones dinámicas se insertarán aquí -->
-            
-                                </select>
-                            </div>
+    <!-- Modal Nuevo Participante (versión completa mejorada) -->
+<div class="modal fade" id="nuevoParticipante" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-rosa-primario text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2"></i>Nuevo Participante
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioParticipantes" class="needs-validation" novalidate>
+                    <!-- Número del participante -->
+                    <div class="mb-3">
+                        <label for="numero" class="form-label">
+                            <i class="fas fa-hashtag me-2 text-rosa-oscuro"></i>Número
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-rosa-claro">
+                                <i class="fas fa-list-ol text-rosa-oscuro"></i>
+                            </span>
+                            <select class="form-select" id="numero" name="numero" required>
+                                <option value="" disabled selected>Selecciona un número</option>
+                                <!-- Opciones dinámicas se insertarán aquí -->
+                            </select>
+                            <div class="invalid-feedback">Por favor selecciona un número válido</div>
                         </div>
+                    </div>
 
-                        <!-- Nombre del participante -->
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">
-                                <i class="fas fa-user me-2 text-rosa-oscuro"></i>Nombre
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-rosa-claro">
-                                    <i class="fas fa-signature text-rosa-oscuro"></i>
-                                </span>
-                                <input type="text" class="form-control" id="nombre" name="nombre"
-                                    placeholder="Nombre completo" required>
-                            </div>
+                    <!-- Nombre del participante -->
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">
+                            <i class="fas fa-user me-2 text-rosa-oscuro"></i>Nombre Completo
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-rosa-claro">
+                                <i class="fas fa-signature text-rosa-oscuro"></i>
+                            </span>
+                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                   placeholder="Ej: Juan Pérez" required minlength="3">
+                            <div class="invalid-feedback">Por favor ingresa un nombre válido (mínimo 3 caracteres)</div>
                         </div>
+                    </div>
 
-                        <!-- Medio número -->
-                        <div class="mb-3 form-check form-switch ps-0">
-                            <div class="d-flex align-items-center">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="medioNumero"
-                                    name="medioNumero">
-                                <label class="form-check-label" for="medioNumero">
-                                    <i class="fas fa-divide me-2 text-rosa-oscuro"></i>Medio Número
-                                </label>
-                            </div>
+                    <!-- Medio número -->
+                    <div class="mb-3 form-check form-switch ps-0">
+                        <div class="d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" 
+                                   id="medioNumero" name="medioNumero">
+                            <label class="form-check-label" for="medioNumero">
+                                <i class="fas fa-divide me-2 text-rosa-oscuro"></i>Medio Número
+                            </label>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Cancelar
-                    </button>
-                    <button type="button" class="btn bg-rosa-primario text-white" id="btnGuardarParticipante">
-                        <i class="fas fa-save me-2"></i>Guardar Participante
-                    </button>
-                </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn bg-rosa-primario text-white" id="btnGuardarParticipante">
+                    <i class="fas fa-save me-2"></i>Guardar Participante
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal Editar Participante -->
     <div class="modal fade" id="editarParticipanteModal" data-bs-backdrop="static">

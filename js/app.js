@@ -28,7 +28,7 @@ const tandaApp = {
         });
 
         // Formulario de Participantes
-        document.getElementById('formularioParticipantes').addEventListener('submit', (e) => {
+        document.getElementById('btnGuardarParticipante').addEventListener('click', (e) => {
             e.preventDefault();
             this.registrarParticipante();
         });
@@ -46,47 +46,53 @@ const tandaApp = {
 
 
     // Funciones para Tandas
-    registrarTanda: function () {
-        const nombreTanda = document.getElementById('nombreTanda').value;
-        const montoPorParticipante = parseFloat(document.getElementById('montoPorParticipante').value);
-        const numeroParticipantes = parseInt(document.getElementById('numeroParticipantes').value);
-        const frecuencia = document.getElementById('frecuencia').value;
-        const fechaInicio = document.getElementById('fechaInicio').value;
-
-        // Validación básica
-        if (!nombreTanda || montoPorParticipante <= 0 || numeroParticipantes < 2 || !frecuencia || !fechaInicio) {
-            alert('Por favor complete todos los campos correctamente');
+    registrarParticipante: function() {
+        const btn = document.getElementById('btnGuardarParticipante');
+        const form = document.getElementById('formularioParticipantes');
+        
+        // Validar formulario primero
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
             return;
         }
-
-        // Calcular fechas y montos
-        const fechaInicioDate = new Date(fechaInicio);
-        let diasPorCiclo = 0;
-        if (frecuencia === 'Semanal') diasPorCiclo = 7;
-        else if (frecuencia === 'Quincenal') diasPorCiclo = 15;
-        else if (frecuencia === 'Mensual') diasPorCiclo = 30;
-
-        const diasTotales = diasPorCiclo * numeroParticipantes;
-        const fechaTermino = new Date(fechaInicioDate);
-        fechaTermino.setDate(fechaInicioDate.getDate() + diasTotales);
-
-        const montoTotal = montoPorParticipante * (numeroParticipantes - 1);
-
-        // Guardar en Firebase
-        db.collection("proyectos").add({
-            tanda: nombreTanda,
-            montoPorParticipante: montoPorParticipante.toFixed(2),
-            participantes: numeroParticipantes,
-            frecuencia: frecuencia,
-            fechaInicio: fechaInicio,
-            fechaTermino: fechaTermino.toISOString().split('T')[0],
-            montoTotal: montoTotal.toFixed(2)
-        }).then(() => {
-            console.log("Tanda registrada");
-            document.getElementById('formularioTanda').reset();
-        }).catch(error => {
-            console.error("Error al registrar tanda:", error);
-        });
+    
+        const btnOriginalHTML = btn.innerHTML;
+        
+        // Estado de carga
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        btn.disabled = true;
+    
+        const participanteData = {
+            numero: parseInt(document.getElementById('numero').value),
+            nombre: document.getElementById('nombre').value.trim(),
+            participacion: document.getElementById('medioNumero').checked ? 'Medio número' : 'Completo',
+            pagado: false,
+            entregada: false,
+            fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
+        };
+    
+        db.collection("datos").add(participanteData)
+            .then(() => {
+                // Éxito
+                console.log("Participante agregado con éxito");
+                
+                // Cerrar modal y resetear
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoParticipante'));
+                modal.hide();
+                form.reset();
+                form.classList.remove('was-validated');
+                
+                // Mostrar notificación
+                this.mostrarAlerta('Participante agregado correctamente', 'success');
+            })
+            .catch(error => {
+                console.error("Error al agregar participante:", error);
+                this.mostrarAlerta(`Error: ${error.message}`, 'danger');
+            })
+            .finally(() => {
+                btn.innerHTML = btnOriginalHTML;
+                btn.disabled = false;
+            });
     },
 
     loadTandas: function () {
@@ -152,27 +158,100 @@ const tandaApp = {
         });
     },
 
+    mostrarAlerta: function(mensaje, tipo) {
+        const alerta = document.createElement('div');
+        alerta.className = `alert alert-${tipo} alert-dismissible fade show fixed-top mx-auto mt-2`;
+        alerta.style.width = '80%';
+        alerta.style.zIndex = '1100';
+        alerta.innerHTML = `
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(alerta);
+        
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alerta);
+            bsAlert.close();
+        }, 3000);
+    },
+
     // Funciones para Participantes
+    // Dentro del objeto tandaApp, modifica la función registrarParticipante:
     registrarParticipante: function () {
+        const btn = document.getElementById('btnGuardarParticipante');
+        const originalText = btn.innerHTML;
+
+        // Mostrar estado de carga
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        btn.disabled = true;
+
         const numero = parseInt(document.getElementById('numero').value);
-        const nombre = document.getElementById('nombre').value;
+        const nombre = document.getElementById('nombre').value.trim();
         const medioNumero = document.getElementById('medioNumero').checked;
 
+        // Validación mejorada
         if (!numero || !nombre) {
             alert('Por favor complete todos los campos');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
             return;
         }
 
-        db.collection("datos").add({
+        // Crear objeto con datos del participante
+        const participanteData = {
             numero: numero,
             nombre: nombre,
-            participacion: medioNumero ? 'Medio número' : 'Completo'
-        }).then(() => {
-            console.log("Participante registrado");
-            document.getElementById('formularioParticipantes').reset();
-        }).catch(error => {
-            console.error("Error al registrar participante:", error);
-        });
+            participacion: medioNumero ? 'Medio número' : 'Completo',
+            pagado: false,
+            entregada: false,
+            fechaRegistro: new Date().toISOString()
+        };
+
+        // Guardar en Firebase
+        db.collection("datos").add(participanteData)
+            .then(() => {
+                console.log("Participante registrado");
+
+                // Cerrar modal y limpiar formulario
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoParticipante'));
+                modal.hide();
+                document.getElementById('formularioParticipantes').reset();
+
+                // Restaurar botón
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                // Mostrar notificación de éxito (opcional)
+                this.mostrarNotificacion('Participante agregado correctamente', 'success');
+            })
+            .catch(error => {
+                console.error("Error al registrar participante:", error);
+
+                // Restaurar botón
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                // Mostrar notificación de error
+                this.mostrarNotificacion('Error al agregar participante: ' + error.message, 'error');
+            });
+    },
+
+    // Función auxiliar para mostrar notificaciones (añadir al objeto tandaApp)
+    mostrarNotificacion: function (mensaje, tipo) {
+        const notificacion = document.createElement('div');
+        notificacion.className = `alert alert-${tipo} fixed-top w-50 mx-auto mt-3 text-center`;
+        notificacion.style.zIndex = '1100';
+        notificacion.textContent = mensaje;
+
+        document.body.appendChild(notificacion);
+
+        // Ocultar después de 3 segundos
+        setTimeout(() => {
+            notificacion.style.transition = 'opacity 0.5s';
+            notificacion.style.opacity = '0';
+            setTimeout(() => notificacion.remove(), 500);
+        }, 3000);
     },
 
     loadParticipantes: function () {
@@ -229,36 +308,37 @@ const tandaApp = {
                     }
 
                     // Crear fila HTML
+                    // En la generación de filas dentro de loadParticipantes:
                     const filaHTML = `
-                        <tr data-id="${doc.id}">
-                        <td class="fw-bold">${data.numero}</td>
-                        <td>${data.nombre}</td>
-                        <td><span class="badge ${claseParticipacion} rounded-pill">${data.participacion}</span></td>
-                        <td class="monto-participante" ${data.pagado ? 'style="text-decoration: line-through;"' : ''}>${montoParticipante.toFixed(2)}</td>
-                        <td>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input check-pagado" type="checkbox" ${data.pagado ? 'checked' : ''}>
-                            </div>
-                        </td>
-                        <td>${montoAEntregar.toFixed(2)}</td>
-                        <td>${fechaEntrega}</td>
-                        <td>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input check-entregada" type="checkbox" ${data.entregada ? 'checked' : ''}>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <button class="btn btn-sm btn-outline-rosa-oscuro btn-editar" data-bs-toggle="modal" data-bs-target="#editarParticipanteModal">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger btn-eliminar" data-bs-toggle="modal" data-bs-target="#confirmarEliminarModal">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                            <tr data-id="${doc.id}">
+                                <td class="fw-bold">${data.numero}</td>
+                                <td>${data.nombre}</td>
+                                <td><span class="badge ${claseParticipacion} rounded-pill">${data.participacion}</span></td>
+                                <td class="monto-participante" ${data.pagado ? 'style="text-decoration: line-through;"' : ''}>${montoParticipante.toFixed(2)}</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input check-pagado" type="checkbox" ${data.pagado ? 'checked' : ''}>
+                                    </div>
+                                </td>
+                                <td class="monto-entregar" ${data.entregada ? 'style="text-decoration: line-through;"' : ''}>${montoAEntregar.toFixed(2)}</td>
+                                <td class="fecha-entrega" ${data.entregada ? 'style="text-decoration: line-through;"' : ''}>${fechaEntrega}</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input check-entregada" type="checkbox" ${data.entregada ? 'checked' : ''}>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <button class="btn btn-sm btn-outline-rosa-oscuro btn-editar" data-bs-toggle="modal" data-bs-target="#editarParticipanteModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-eliminar" data-bs-toggle="modal" data-bs-target="#confirmarEliminarModal">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            `;
 
 
                     filas.push({ numero: data.numero, html: filaHTML });
@@ -290,6 +370,32 @@ const tandaApp = {
                         } else {
                             montoCell.style.textDecoration = 'none';
                         }
+
+                        // Evento check-entregada:
+                        document.querySelectorAll('.check-entregada').forEach(checkbox => {
+                            checkbox.addEventListener('change', function () {
+                                const fila = this.closest('tr');
+                                const id = fila.getAttribute('data-id');
+                                const montoCell = fila.querySelector('td:nth-child(6)'); // Celda "A entregar"
+                                const fechaCell = fila.querySelector('td:nth-child(7)'); // Celda "Fecha"
+
+                                // Aplicar/remover tachado a "A entregar" y "Fecha"
+                                if (this.checked) {
+                                    fila.style.backgroundColor = '#e6ffed';
+                                    montoCell.style.textDecoration = 'line-through';
+                                    fechaCell.style.textDecoration = 'line-through';
+                                } else {
+                                    fila.style.backgroundColor = '';
+                                    montoCell.style.textDecoration = 'none';
+                                    fechaCell.style.textDecoration = 'none';
+                                }
+
+                                // Actualizar en Firebase
+                                db.collection("datos").doc(id).update({
+                                    entregada: this.checked
+                                });
+                            });
+                        });
 
                         // Actualizar en Firebase
                         db.collection("datos").doc(id).update({

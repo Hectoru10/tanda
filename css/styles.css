@@ -202,6 +202,53 @@ body {
     background-color: rgba(0,0,0,0.5);
 }
 
+/* En tu archivo styles.css */
+.monto-entregar,
+.fecha-entrega {
+    transition: text-decoration 0.3s ease;
+}
+
+[style*="text-decoration: line-through"] {
+    color: #6c757d; /* Color gris para texto tachado */
+    font-style: italic;
+}
+
+/* Notificaciones */
+.alert.fixed-top {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+/* Validación de formularios */
+.needs-validation .form-control:invalid,
+.needs-validation .form-select:invalid {
+    border-color: #dc3545;
+}
+
+.needs-validation .form-control:valid,
+.needs-validation .form-select:valid {
+    border-color: #28a745;
+}
+
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+    border-color: #dc3545;
+}
+
 
 
 
