@@ -5,103 +5,55 @@
     --rosa-oscuro: #c9184a;
     --rosa-claro: #fff0f3;
     --rosa-muy-claro: #fff9fa;
+    --border-radius-general: 10px;
+    --transition-general: all 0.3s ease;
 }
 
-.badge-completo {
-    background-color: #E3F2FD;
-    color: #0D47A1;
-    border: 1px solid #90CAF9;
-}
-
-.badge-medio {
-    background-color: #FFF8E1;
-    color: #E65100;
-    border: 1px solid #FFD54F;
-}
-
-.switch-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-
-/* Estilos para los switches */
-.table td {
-    vertical-align: middle !important;
-}
-
-.form-switch .form-check-input {
-    width: 2.5em;
-    height: 1.5em;
-    margin-left: 0;
-}
-
-/* Asegurar que los badges sean redondeados */
-.badge-completo,
-.badge-medio {
-    border-radius: 50rem !important;
-    padding: 0.35em 0.65em;
-    font-weight: 500;
-}
-
-/* Clases de colores */
-.bg-rosa-primario {
-    background-color: var(--rosa-primario) !important;
-}
-
-.bg-rosa-secundario {
-    background-color: var(--rosa-secundario) !important;
-}
-
-.bg-rosa-oscuro {
-    background-color: var(--rosa-oscuro) !important;
-}
-
-.bg-rosa-claro {
-    background-color: var(--rosa-claro) !important;
-}
-
-.bg-rosa-muy-claro {
-    background-color: var(--rosa-muy-claro) !important;
-}
-
-.text-rosa-primario {
-    color: var(--rosa-primario) !important;
-}
-
-.text-rosa-oscuro {
-    color: var(--rosa-oscuro) !important;
-}
-
-/* Estilos personalizados */
+/* Estilos base */
 body {
     background-color: var(--rosa-muy-claro);
     color: #495057;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
 }
 
-.table-rosa-claro {
-    background-color: var(--rosa-claro);
-}
+/* Clases de colores */
+.bg-rosa-primario { background-color: var(--rosa-primario) !important; }
+.bg-rosa-secundario { background-color: var(--rosa-secundario) !important; }
+.bg-rosa-oscuro { background-color: var(--rosa-oscuro) !important; }
+.bg-rosa-claro { background-color: var(--rosa-claro) !important; }
+.bg-rosa-muy-claro { background-color: var(--rosa-muy-claro) !important; }
 
-.table-bordered th {
-    border: 1px solid var(--rosa-oscuro) !important;
-}
+.text-rosa-primario { color: var(--rosa-primario) !important; }
+.text-rosa-secundario { color: var(--rosa-secundario) !important; }
+.text-rosa-oscuro { color: var(--rosa-oscuro) !important; }
 
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: var(--rosa-muy-claro) !important;
-}
+/* Bordes */
+.border-rosa-secundario { border-color: var(--rosa-secundario) !important; }
 
-
+/* Componentes */
 .card {
-    border-radius: 10px;
+    border-radius: var(--border-radius-general);
     overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-general);
+}
+
+.card:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    font-weight: 600;
 }
 
 .btn {
-    border-radius: 20px;
+    border-radius: 50px;
     padding: 8px 20px;
-    transition: all 0.3s;
+    font-weight: 500;
+    transition: var(--transition-general);
+    border: none;
 }
 
 .btn:hover {
@@ -109,198 +61,169 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.btn-outline-rosa-oscuro {
+    color: var(--rosa-oscuro);
+    border-color: var(--rosa-oscuro);
+}
+
+.btn-outline-rosa-oscuro:hover {
+    background-color: var(--rosa-oscuro);
+    color: white;
+}
+
+/* Tablas */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: var(--rosa-claro);
+    color: var(--rosa-oscuro);
+}
+
 .table-hover tbody tr:hover {
-    background-color: rgba(232, 62, 140, 0.1);
+    background-color: rgba(232, 62, 140, 0.1) !important;
 }
 
-/* Paginación personalizada */
-.page-link {
-    border: none;
-    margin: 0 5px;
-    border-radius: 20px !important;
+.table-rosa-claro {
+    background-color: var(--rosa-claro);
 }
 
-.page-link:hover {
-    background-color: var(--rosa-secundario) !important;
-    color: white !important;
-}
-
-/* Estilo del checkbox */
-.form-check-input {
-    width: 1.2rem; /* Ajusta el tamaño */
-    height: 1.2rem;
-    background-color: var(--rosa-claro); /* Fondo inicial */
-    
-    border-radius: 0.25rem;
-    transition: all 0.3s ease; /* Transición suave */
-}
-
-/* Cambiar el color cuando el checkbox está marcado */
-.form-check-input:checked {
-    background-color: var(--rosa-primario); /* Fondo rosa primario */
-    border-color: var(--rosa-secundario); /* Borde rosa secundario */
-    box-shadow: 0 0 5px rgba(232, 62, 140, 0.5); /* Efecto suave al marcar */
-}
-
-/* Cambiar el color al enfocar el checkbox */
-.form-check-input:focus {
-    outline: none; /* Eliminar el borde azul por defecto */
-    box-shadow: 0 0 5px rgba(255, 133, 162, 0.6); /* Rosa secundario */
-}
-
-.progress-tanda {
-    height: 20px;
-    background-color: #f0f0f0;
-}
-
-.progress-bar-tanda {
-    background-color: #4CAF50;
-    transition: width 0.6s ease;
-}
-
-.alert-pendiente {
-    background-color: #FFF3E0;
-    border-left: 4px solid #FFA000;
-    color: #E65100;
-}
-
-.alert-proximo {
-    background-color: #E8F5E9;
-    border-left: 4px solid #4CAF50;
-    color: #2E7D32;
-}
-
-/* Estilo para los badges */
+/* Badges */
 .badge-completo {
     background-color: #28a745;
     color: white;
 }
+
 .badge-medio {
     background-color: #ffc107;
     color: black;
 }
 
-/* Para mejorar la apariencia de los switches */
+.badge {
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+}
+
+/* Formularios */
+.form-control, .form-select {
+    border-radius: var(--border-radius-general);
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    transition: var(--transition-general);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--rosa-secundario);
+    box-shadow: 0 0 0 0.25rem rgba(232, 62, 140, 0.25);
+}
+
+.input-group-text {
+    background-color: var(--rosa-claro);
+    color: var(--rosa-oscuro);
+    border: 1px solid #dee2e6;
+}
+
+/* Switches */
 .form-switch .form-check-input {
     width: 3em;
     height: 1.5em;
     cursor: pointer;
+    background-color: var(--rosa-claro);
+    border-color: var(--rosa-secundario);
 }
 
-/* Añade esto a tu archivo styles.css */
-.modal-backdrop {
-    z-index: 1040 !important; /* Asegura que esté por encima de otros elementos */
+.form-switch .form-check-input:checked {
+    background-color: var(--rosa-primario);
+    border-color: var(--rosa-primario);
 }
 
-.modal {
-    z-index: 1050 !important;
+/* Progress bars */
+.progress-tanda {
+    height: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
 }
 
-/* Estilo para cuando el modal está en transición */
-.modal.fade.show {
-    display: block !important;
-    background-color: rgba(0,0,0,0.5);
+.progress-bar-tanda {
+    background-color: var(--rosa-primario);
+    transition: width 0.6s ease;
 }
 
-/* En tu archivo styles.css */
-.monto-entregar,
-.fecha-entrega {
-    transition: text-decoration 0.3s ease;
+/* Alertas */
+.alert {
+    border-radius: var(--border-radius-general);
+    border-left: 4px solid transparent;
 }
 
-[style*="text-decoration: line-through"] {
-    color: #6c757d; /* Color gris para texto tachado */
-    font-style: italic;
+.alert-pendiente {
+    background-color: #FFF3E0;
+    border-left-color: #FFA000;
+    color: #E65100;
 }
 
-/* Notificaciones */
+.alert-proximo {
+    background-color: #E8F5E9;
+    border-left-color: #4CAF50;
+    color: #2E7D32;
+}
+
 .alert.fixed-top {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
+    width: 80%;
+    z-index: 1100;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border-color: #c3e6cb;
+/* Modales */
+.modal-content {
+    border-radius: var(--border-radius-general);
+    overflow: hidden;
+    border: none;
 }
 
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
 }
 
 /* Validación de formularios */
-.needs-validation .form-control:invalid,
-.needs-validation .form-select:invalid {
-    border-color: #dc3545;
-}
-
-.needs-validation .form-control:valid,
-.needs-validation .form-select:valid {
-    border-color: #28a745;
-}
-
 .was-validated .form-control:invalid,
 .was-validated .form-select:invalid {
     border-color: #dc3545;
 }
 
-/* Añade esto a tu archivo styles.css */
-.progress-tanda {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    overflow: hidden;
+.was-validated .form-control:valid,
+.was-validated .form-select:valid {
+    border-color: #28a745;
 }
 
-.progress-bar-tanda {
-    background-color: #e91e63; /* Color rosa principal */
-    transition: width 0.6s ease;
+.invalid-feedback {
+    font-size: 0.85rem;
 }
 
-/* Colores para diferentes estados (opcional) */
-.progress-bar-tanda.bg-success {
-    background-color: #28a745 !important; /* Verde para entregados */
+/* Elementos deshabilitados */
+.nav-link.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-.progress-bar-tanda.bg-warning {
-    background-color: #ffc107 !important; /* Amarillo para en progreso */
+/* Texto tachado */
+[style*="text-decoration: line-through"] {
+    color: #6c757d;
+    font-style: italic;
+    transition: var(--transition-general);
 }
 
-/* Estilos para la barra de progreso */
-.progress-tanda {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.progress-bar-tanda {
-    background-color: #e91e63;
-    transition: width 0.6s ease;
-}
-
-.progress-bar-tanda.bg-success {
-    background-color: #28a745;
-}
-
-/* Estilos para los contadores */
-#progress-container-${tandaId} strong {
-    font-weight: 600;
-}
-
-#progress-container-${tandaId} .badge {
-    padding: 0.35em 0.65em;
-    font-size: 0.75em;
-}
-
-
-
-
-/* Mejoras responsivas */
+/* Responsive */
 @media (max-width: 768px) {
     .card-body .row > .col-md-4 {
         border-end: none !important;
@@ -319,21 +242,7 @@ body {
     }
 }
 
-/* Alert personalizado */
-.alert-rosa-secundario {
-    background-color: rgba(255, 133, 162, 0.2);
-    border-left: 4px solid var(--rosa-secundario);
-    color: #495057;
-}
-
-/* Modal personalizado */
-.modal-content {
-    border-radius: 10px;
-    overflow: hidden;
-    border: none;
-}
-
-/* Botones flotantes para móviles */
+/* Botón flotante para móviles */
 .btn-floating {
     display: none;
     position: fixed;
@@ -353,4 +262,18 @@ body {
         align-items: center;
         justify-content: center;
     }
+    
+    .modal-dialog {
+        margin: 1rem auto;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
 }
