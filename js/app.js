@@ -95,67 +95,114 @@ const tandaApp = {
             });
     },
 
-    loadTandas: function () {
+    loadTandas: function() {
         const tablaTandas = document.getElementById('tablaTandas');
-
-        db.collection("proyectos").onSnapshot((querySnapshot) => {
-            tablaTandas.innerHTML = ''; // Limpiar tabla
-
-            querySnapshot.forEach((doc) => {
+    
+        // Observar cambios en los proyectos
+        db.collection("proyectos").onSnapshot((proyectoSnapshot) => {
+            tablaTandas.innerHTML = ''; // Limpiar contenedor
+    
+            proyectoSnapshot.forEach((doc) => {
                 const data = doc.data();
-                const fila = `
-                    <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-tag me-2 text-secondary"></i>Tanda:</span>
-                                <span class="fw-bold">${data.tanda}</span>
+                const tandaId = doc.id;
+                const totalParticipantes = data.participantes || 1; // Evitar división por cero
+    
+                // Primero obtener el conteo inicial de entregados
+                db.collection("datos").where("entregada", "==", true).get().then((entregadosSnapshot) => {
+                    const entregados = entregadosSnapshot.size;
+                    const porcentaje = Math.round((entregados / totalParticipantes) * 100);
+                    const pendientes = totalParticipantes - entregados;
+    
+                    // Crear HTML completo de la tanda
+                    const tandaHTML = `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-tag me-2 text-secondary"></i>Tanda:</span>
+                            <span class="fw-bold">${data.tanda}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-money-bill-wave me-2 text-secondary"></i>Monto por participante:</span>
+                            <span class="fw-bold">$${parseFloat(data.montoPorParticipante).toFixed(2)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-users me-2 text-secondary"></i>Participantes:</span>
+                            <span class="fw-bold">${totalParticipantes}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-calendar-alt me-2 text-secondary"></i>Frecuencia:</span>
+                            <span class="fw-bold">${data.frecuencia}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-calendar-day me-2 text-secondary"></i>Inicio:</span>
+                            <span class="fw-bold">${data.fechaInicio}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-calendar-check me-2 text-secondary"></i>Fin:</span>
+                            <span class="fw-bold">${data.fechaTermino}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-calculator me-2 text-secondary"></i>Monto Total:</span>
+                            <span class="fw-bold">$${parseFloat(data.montoTotal).toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="mt-3 pt-2 border-top" id="progress-container-${tandaId}">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span><i class="fas fa-check-circle me-1 text-success"></i>Entregados:
+                                    <strong id="entregados-count-${tandaId}">${entregados}/${totalParticipantes}</strong></span>
+                                <span id="porcentaje-${tandaId}">${porcentaje}% completado</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-money-bill-wave me-2 text-secondary"></i>Monto por
-                                    participante:</span>
-                                <span class="fw-bold">${data.montoPorParticipante}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-users me-2 text-secondary"></i>Participantes:</span>
-                                <span class="fw-bold">${data.participantes}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-calendar-alt me-2 text-secondary"></i>Frecuencia:</span>
-                                <span class="fw-bold">${data.frecuencia}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-calendar-day me-2 text-secondary"></i>Inicio:</span>
-                                <span class="fw-bold">${data.fechaInicio}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-calendar-check me-2 text-secondary"></i>Fin:</span>
-                                <span class="fw-bold">${data.fechaTermino}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-calculator me-2 text-secondary"></i>Monto Total:</span>
-                                <span class="fw-bold">${data.montoTotal}</span>
-                            </div>
-                            
-                            <div class="mt-3 pt-2 border-top">
-                                <div class="d-flex justify-content-between small mb-1">
-                                    <span><i class="fas fa-check-circle me-1 text-success"></i>Pagados:
-                                        <strong>7/11</strong></span>
-                                    <span>64% completado</span>
+                            <div class="progress progress-tanda mb-2" style="height: 10px;">
+                                <div id="progress-bar-${tandaId}" 
+                                    class="progress-bar progress-bar-tanda bg-success" 
+                                    role="progressbar" 
+                                    style="width: ${porcentaje}%"
+                                    aria-valuenow="${porcentaje}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
                                 </div>
-                                <div class="progress progress-tanda mb-2">
-                                    <div class="progress-bar progress-bar-tanda" role="progressbar" style="width: 64%"
-                                        aria-valuenow="64" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <div class="d-flex justify-content-between small">
-                                    <span class="badge bg-rosa-claro text-rosa-oscuro"><i
-                                            class="fas fa-clock me-1"></i>4 pendientes</span>
-                                </div>
                             </div>
-                `;
-                tablaTandas.innerHTML += fila;
-
-                // Actualizar select de números
-                this.actualizarSelectNumeros(data.participantes);
+                            <div class="d-flex justify-content-between small">
+                                <span class="badge bg-rosa-claro text-rosa-oscuro" id="pendientes-${tandaId}">
+                                    <i class="fas fa-clock me-1"></i>${pendientes} pendientes
+                                </span>
+                            </div>
+                        </div>
+                    `;
+    
+                    tablaTandas.innerHTML += tandaHTML;
+                    this.actualizarSelectNumeros(totalParticipantes);
+    
+                    // Configurar listener en tiempo real para actualizaciones
+                    this.configurarListenerEntregas(tandaId, totalParticipantes);
+                });
             });
         });
+    },
+    
+    // Función para configurar listener de entregas en tiempo real
+    configurarListenerEntregas: function(tandaId, totalParticipantes) {
+        const unsubscribe = db.collection("datos").where("entregada", "==", true).onSnapshot((snapshot) => {
+            const entregados = snapshot.size;
+            const porcentaje = Math.round((entregados / totalParticipantes) * 100);
+            const pendientes = totalParticipantes - entregados;
+    
+            // Actualizar elementos dinámicamente
+            const entregadosElement = document.getElementById(`entregados-count-${tandaId}`);
+            const porcentajeElement = document.getElementById(`porcentaje-${tandaId}`);
+            const barraElement = document.getElementById(`progress-bar-${tandaId}`);
+            const pendientesElement = document.getElementById(`pendientes-${tandaId}`);
+    
+            if (entregadosElement) entregadosElement.textContent = `${entregados}/${totalParticipantes}`;
+            if (porcentajeElement) porcentajeElement.textContent = `${porcentaje}% completado`;
+            if (barraElement) {
+                barraElement.style.width = `${porcentaje}%`;
+                barraElement.setAttribute('aria-valuenow', porcentaje);
+            }
+            if (pendientesElement) pendientesElement.innerHTML = `<i class="fas fa-clock me-1"></i>${pendientes} pendientes`;
+        });
+    
+        // Guardar la función unsubscribe si necesitas cancelar el listener luego
+        this.unsubscribeListeners = this.unsubscribeListeners || {};
+        this.unsubscribeListeners[tandaId] = unsubscribe;
     },
 
     mostrarAlerta: function(mensaje, tipo) {

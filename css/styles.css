@@ -249,6 +249,54 @@ body {
     border-color: #dc3545;
 }
 
+/* Añade esto a tu archivo styles.css */
+.progress-tanda {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-tanda {
+    background-color: #e91e63; /* Color rosa principal */
+    transition: width 0.6s ease;
+}
+
+/* Colores para diferentes estados (opcional) */
+.progress-bar-tanda.bg-success {
+    background-color: #28a745 !important; /* Verde para entregados */
+}
+
+.progress-bar-tanda.bg-warning {
+    background-color: #ffc107 !important; /* Amarillo para en progreso */
+}
+
+/* Estilos para la barra de progreso */
+.progress-tanda {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.progress-bar-tanda {
+    background-color: #e91e63;
+    transition: width 0.6s ease;
+}
+
+.progress-bar-tanda.bg-success {
+    background-color: #28a745;
+}
+
+/* Estilos para los contadores */
+#progress-container-${tandaId} strong {
+    font-weight: 600;
+}
+
+#progress-container-${tandaId} .badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+}
+
 
 
 
