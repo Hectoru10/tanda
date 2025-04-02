@@ -14,8 +14,9 @@ const db = firebase.firestore();
 
 // Objeto principal de la aplicación
 const tandaApp = {
-    init: function () {
+    init: function() {
         this.bindEvents();
+        this.configurarEdicionTanda(); // Añade esta línea
         this.loadTandas();
         this.loadParticipantes();
     },
@@ -45,23 +46,159 @@ const tandaApp = {
     },
 
 
+    // Dentro del objeto tandaApp:
+    configurarEdicionTanda: function () {
+        // Cargar datos al abrir el modal
+        document.getElementById('editarTandaModal').addEventListener('show.bs.modal', () => {
+            this.cargarDatosParaEdicion();
+        });
+
+        // Configurar el botón de guardar
+        document.getElementById('btnGuardarCambiosTanda').addEventListener('click', () => {
+            this.guardarCambiosTanda();
+        });
+    },
+
+    cargarDatosParaEdicion: function () {
+        const btn = document.getElementById('btnGuardarCambiosTanda');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Cargando...';
+        btn.disabled = true;
+
+        // Obtener la tanda activa
+        db.collection("proyectos").limit(1).get().then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+                const doc = querySnapshot.docs[0];
+                const data = doc.data();
+
+                // Llenar el formulario con los datos actuales
+                document.getElementById('editarNombreTanda').value = data.tanda || '';
+                document.getElementById('editarMontoParticipante').value = data.montoPorParticipante || '';
+                document.getElementById('editarNumParticipantes').value = data.participantes || '';
+                document.getElementById('editarFrecuenciaPagos').value = data.frecuencia || 'Semanal';
+                document.getElementById('editarFechaInicio').value = data.fechaInicio || '';
+
+                // Guardar el ID del documento para la actualización
+                document.getElementById('editarTandaModal').setAttribute('data-doc-id', doc.id);
+            }
+        }).catch(error => {
+            console.error("Error al cargar datos para edición:", error);
+            this.mostrarAlerta('Error al cargar datos para edición', 'danger');
+        }).finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    },
+
+    guardarCambiosTanda: function () {
+        const btn = document.getElementById('btnGuardarCambiosTanda');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        btn.disabled = true;
+
+        const docId = document.getElementById('editarTandaModal').getAttribute('data-doc-id');
+        if (!docId) {
+            this.mostrarAlerta('No se encontró el documento para actualizar', 'danger');
+            return;
+        }
+
+        // Obtener valores del formulario
+        const tandaActualizada = {
+            tanda: document.getElementById('editarNombreTanda').value,
+            montoPorParticipante: parseFloat(document.getElementById('editarMontoParticipante').value),
+            participantes: parseInt(document.getElementById('editarNumParticipantes').value),
+            frecuencia: document.getElementById('editarFrecuenciaPagos').value,
+            fechaInicio: document.getElementById('editarFechaInicio').value,
+            // Mantener estos campos que no se editan pero son necesarios
+            fechaTermino: this.calcularFechaTermino(
+                document.getElementById('editarFechaInicio').value,
+                document.getElementById('editarFrecuenciaPagos').value,
+                parseInt(document.getElementById('editarNumParticipantes').value)
+            ),
+            montoTotal: parseFloat(document.getElementById('editarMontoParticipante').value) *
+                (parseInt(document.getElementById('editarNumParticipantes').value) - 1)
+        };
+
+        // Validación básica
+        if (!tandaActualizada.tanda || isNaN(tandaActualizada.montoPorParticipante) ||
+            isNaN(tandaActualizada.participantes) || !tandaActualizada.fechaInicio) {
+            this.mostrarAlerta('Por favor complete todos los campos correctamente', 'warning');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        // Actualizar en Firebase
+        db.collection("proyectos").doc(docId).update(tandaActualizada)
+            .then(() => {
+                this.mostrarAlerta('Tanda actualizada correctamente', 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editarTandaModal'));
+                modal.hide();
+            })
+            .catch(error => {
+                console.error("Error al actualizar tanda:", error);
+                this.mostrarAlerta('Error al actualizar tanda: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    },
+
+    calcularFechaTermino: function (fechaInicio, frecuencia, participantes) {
+        const fecha = new Date(fechaInicio);
+        let diasPorCiclo = 7; // Semanal por defecto
+
+        if (frecuencia === 'Quincenal') diasPorCiclo = 15;
+        else if (frecuencia === 'Mensual') diasPorCiclo = 30;
+
+        fecha.setDate(fecha.getDate() + (diasPorCiclo * participantes));
+        return fecha.toISOString().split('T')[0];
+    },
+
+    mostrarAlerta: function (mensaje, tipo) {
+        // Usa la misma función de alerta que en las otras partes
+        const alerta = document.createElement('div');
+        alerta.className = `alert alert-${tipo} alert-dismissible fade show fixed-top mx-auto mt-2`;
+        alerta.style.width = '80%';
+        alerta.style.zIndex = '1100';
+        alerta.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+        document.body.appendChild(alerta);
+
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alerta);
+            bsAlert.close();
+        }, 3000);
+    },
+
+
+
+
+
+
+
+
     // Funciones para Tandas
-    registrarParticipante: function() {
+    registrarParticipante: function () {
         const btn = document.getElementById('btnGuardarParticipante');
         const form = document.getElementById('formularioParticipantes');
-        
+
         // Validar formulario primero
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
             return;
         }
-    
+
         const btnOriginalHTML = btn.innerHTML;
-        
+
         // Estado de carga
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
         btn.disabled = true;
-    
+
         const participanteData = {
             numero: parseInt(document.getElementById('numero').value),
             nombre: document.getElementById('nombre').value.trim(),
@@ -70,18 +207,18 @@ const tandaApp = {
             entregada: false,
             fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
         };
-    
+
         db.collection("datos").add(participanteData)
             .then(() => {
                 // Éxito
                 console.log("Participante agregado con éxito");
-                
+
                 // Cerrar modal y resetear
                 const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoParticipante'));
                 modal.hide();
                 form.reset();
                 form.classList.remove('was-validated');
-                
+
                 // Mostrar notificación
                 this.mostrarAlerta('Participante agregado correctamente', 'success');
             })
@@ -95,24 +232,24 @@ const tandaApp = {
             });
     },
 
-    loadTandas: function() {
+    loadTandas: function () {
         const tablaTandas = document.getElementById('tablaTandas');
-    
+
         // Observar cambios en los proyectos
         db.collection("proyectos").onSnapshot((proyectoSnapshot) => {
             tablaTandas.innerHTML = ''; // Limpiar contenedor
-    
+
             proyectoSnapshot.forEach((doc) => {
                 const data = doc.data();
                 const tandaId = doc.id;
                 const totalParticipantes = data.participantes || 1; // Evitar división por cero
-    
+
                 // Primero obtener el conteo inicial de entregados
                 db.collection("datos").where("entregada", "==", true).get().then((entregadosSnapshot) => {
                     const entregados = entregadosSnapshot.size;
                     const porcentaje = Math.round((entregados / totalParticipantes) * 100);
                     const pendientes = totalParticipantes - entregados;
-    
+
                     // Crear HTML completo de la tanda
                     const tandaHTML = `
                         <div class="d-flex justify-content-between mb-2">
@@ -167,30 +304,30 @@ const tandaApp = {
                             </div>
                         </div>
                     `;
-    
+
                     tablaTandas.innerHTML += tandaHTML;
                     this.actualizarSelectNumeros(totalParticipantes);
-    
+
                     // Configurar listener en tiempo real para actualizaciones
                     this.configurarListenerEntregas(tandaId, totalParticipantes);
                 });
             });
         });
     },
-    
+
     // Función para configurar listener de entregas en tiempo real
-    configurarListenerEntregas: function(tandaId, totalParticipantes) {
+    configurarListenerEntregas: function (tandaId, totalParticipantes) {
         const unsubscribe = db.collection("datos").where("entregada", "==", true).onSnapshot((snapshot) => {
             const entregados = snapshot.size;
             const porcentaje = Math.round((entregados / totalParticipantes) * 100);
             const pendientes = totalParticipantes - entregados;
-    
+
             // Actualizar elementos dinámicamente
             const entregadosElement = document.getElementById(`entregados-count-${tandaId}`);
             const porcentajeElement = document.getElementById(`porcentaje-${tandaId}`);
             const barraElement = document.getElementById(`progress-bar-${tandaId}`);
             const pendientesElement = document.getElementById(`pendientes-${tandaId}`);
-    
+
             if (entregadosElement) entregadosElement.textContent = `${entregados}/${totalParticipantes}`;
             if (porcentajeElement) porcentajeElement.textContent = `${porcentaje}% completado`;
             if (barraElement) {
@@ -199,13 +336,13 @@ const tandaApp = {
             }
             if (pendientesElement) pendientesElement.innerHTML = `<i class="fas fa-clock me-1"></i>${pendientes} pendientes`;
         });
-    
+
         // Guardar la función unsubscribe si necesitas cancelar el listener luego
         this.unsubscribeListeners = this.unsubscribeListeners || {};
         this.unsubscribeListeners[tandaId] = unsubscribe;
     },
 
-    mostrarAlerta: function(mensaje, tipo) {
+    mostrarAlerta: function (mensaje, tipo) {
         const alerta = document.createElement('div');
         alerta.className = `alert alert-${tipo} alert-dismissible fade show fixed-top mx-auto mt-2`;
         alerta.style.width = '80%';
@@ -214,9 +351,9 @@ const tandaApp = {
             ${mensaje}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
+
         document.body.appendChild(alerta);
-        
+
         setTimeout(() => {
             const bsAlert = new bootstrap.Alert(alerta);
             bsAlert.close();

@@ -242,6 +242,7 @@
     </div>
 
     <!-- Modal para editar tanda -->
+    <!-- Modal para editar tanda (asegúrate que tenga este ID) -->
     <div class="modal fade" id="editarTandaModal" tabindex="-1" aria-labelledby="editarTandaModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -265,8 +266,7 @@
                                     <span class="input-group-text bg-rosa-claro">
                                         <i class="fas fa-pencil-alt text-rosa-oscuro"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="editarNombreTanda"
-                                        value="Vacaciones 2025" required>
+                                    <input type="text" class="form-control" id="editarNombreTanda" required>
                                 </div>
                             </div>
 
@@ -277,8 +277,8 @@
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-rosa-claro">$</span>
-                                    <input type="number" class="form-control" id="editarMontoParticipante"
-                                        value="500.00" min="1" required>
+                                    <input type="number" class="form-control" id="editarMontoParticipante" min="1"
+                                        required>
                                     <span class="input-group-text bg-rosa-claro">MXN</span>
                                 </div>
                             </div>
@@ -291,8 +291,8 @@
                                     <span class="input-group-text bg-rosa-claro">
                                         <i class="fas fa-user-plus text-rosa-oscuro"></i>
                                     </span>
-                                    <input type="number" class="form-control" id="editarNumParticipantes" value="11"
-                                        min="2" required>
+                                    <input type="number" class="form-control" id="editarNumParticipantes" min="2"
+                                        required>
                                 </div>
                                 <small class="text-muted">
                                     <i class="fas fa-info-circle me-1"></i>No puedes reducir el número de participantes
@@ -310,7 +310,7 @@
                                         <i class="fas fa-clock text-rosa-oscuro"></i>
                                     </span>
                                     <select class="form-select" id="editarFrecuenciaPagos" required>
-                                        <option value="Semanal" selected>Semanal</option>
+                                        <option value="Semanal">Semanal</option>
                                         <option value="Quincenal">Quincenal</option>
                                         <option value="Mensual">Mensual</option>
                                     </select>
@@ -325,8 +325,7 @@
                                     <span class="input-group-text bg-rosa-claro">
                                         <i class="fas fa-calendar-check text-rosa-oscuro"></i>
                                     </span>
-                                    <input type="date" class="form-control" id="editarFechaInicio" value="2025-07-15"
-                                        required>
+                                    <input type="date" class="form-control" id="editarFechaInicio" required>
                                 </div>
                             </div>
                         </div>
@@ -345,72 +344,74 @@
     </div>
 
     <!-- Modal Nuevo Participante (versión completa mejorada) -->
-<div class="modal fade" id="nuevoParticipante" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-rosa-primario text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-user-plus me-2"></i>Nuevo Participante
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formularioParticipantes" class="needs-validation" novalidate>
-                    <!-- Número del participante -->
-                    <div class="mb-3">
-                        <label for="numero" class="form-label">
-                            <i class="fas fa-hashtag me-2 text-rosa-oscuro"></i>Número
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-rosa-claro">
-                                <i class="fas fa-list-ol text-rosa-oscuro"></i>
-                            </span>
-                            <select class="form-select" id="numero" name="numero" required>
-                                <option value="" disabled selected>Selecciona un número</option>
-                                <!-- Opciones dinámicas se insertarán aquí -->
-                            </select>
-                            <div class="invalid-feedback">Por favor selecciona un número válido</div>
-                        </div>
-                    </div>
-
-                    <!-- Nombre del participante -->
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">
-                            <i class="fas fa-user me-2 text-rosa-oscuro"></i>Nombre Completo
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-rosa-claro">
-                                <i class="fas fa-signature text-rosa-oscuro"></i>
-                            </span>
-                            <input type="text" class="form-control" id="nombre" name="nombre" 
-                                   placeholder="Ej: Juan Pérez" required minlength="3">
-                            <div class="invalid-feedback">Por favor ingresa un nombre válido (mínimo 3 caracteres)</div>
-                        </div>
-                    </div>
-
-                    <!-- Medio número -->
-                    <div class="mb-3 form-check form-switch ps-0">
-                        <div class="d-flex align-items-center">
-                            <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" 
-                                   id="medioNumero" name="medioNumero">
-                            <label class="form-check-label" for="medioNumero">
-                                <i class="fas fa-divide me-2 text-rosa-oscuro"></i>Medio Número
+    <div class="modal fade" id="nuevoParticipante" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-rosa-primario text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Nuevo Participante
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formularioParticipantes" class="needs-validation" novalidate>
+                        <!-- Número del participante -->
+                        <div class="mb-3">
+                            <label for="numero" class="form-label">
+                                <i class="fas fa-hashtag me-2 text-rosa-oscuro"></i>Número
                             </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-rosa-claro">
+                                    <i class="fas fa-list-ol text-rosa-oscuro"></i>
+                                </span>
+                                <select class="form-select" id="numero" name="numero" required>
+                                    <option value="" disabled selected>Selecciona un número</option>
+                                    <!-- Opciones dinámicas se insertarán aquí -->
+                                </select>
+                                <div class="invalid-feedback">Por favor selecciona un número válido</div>
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancelar
-                </button>
-                <button type="button" class="btn bg-rosa-primario text-white" id="btnGuardarParticipante">
-                    <i class="fas fa-save me-2"></i>Guardar Participante
-                </button>
+
+                        <!-- Nombre del participante -->
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">
+                                <i class="fas fa-user me-2 text-rosa-oscuro"></i>Nombre Completo
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-rosa-claro">
+                                    <i class="fas fa-signature text-rosa-oscuro"></i>
+                                </span>
+                                <input type="text" class="form-control" id="nombre" name="nombre"
+                                    placeholder="Ej: Juan Pérez" required minlength="3">
+                                <div class="invalid-feedback">Por favor ingresa un nombre válido (mínimo 3 caracteres)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medio número -->
+                        <div class="mb-3 form-check form-switch ps-0">
+                            <div class="d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="medioNumero"
+                                    name="medioNumero">
+                                <label class="form-check-label" for="medioNumero">
+                                    <i class="fas fa-divide me-2 text-rosa-oscuro"></i>Medio Número
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn bg-rosa-primario text-white" id="btnGuardarParticipante">
+                        <i class="fas fa-save me-2"></i>Guardar Participante
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Modal Editar Participante -->
     <div class="modal fade" id="editarParticipanteModal" data-bs-backdrop="static">
@@ -485,7 +486,8 @@
                     <h5 class="modal-title">
                         <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
                     <i class="fas fa-user-times fa-4x text-danger mb-3"></i>
