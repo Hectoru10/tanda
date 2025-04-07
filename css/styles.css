@@ -216,6 +216,82 @@ body {
     cursor: not-allowed;
 }
 
+/* Estilos para los botones de acción */
+.btn-marcar-pagado {
+    font-size: 0.8rem;
+    padding: 0 0.3rem;
+    vertical-align: middle;
+    text-decoration: none !important;
+}
+
+.btn-marcar-pagado:hover {
+    transform: scale(1.2);
+    color: #28a745 !important;
+}
+
+/* Ajustes para las listas */
+#listaPagosPendientes {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#listaPagosPendientes li {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#listaPagosPendientes li:last-child {
+    border-bottom: none;
+}
+
+/* Estilos para las listas con scroll */
+.lista-contenedor {
+    max-height: 150px; /* Altura para mostrar aproximadamente 3 ítems */
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.lista-scroll {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.lista-scroll li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+}
+
+.lista-scroll li:last-child {
+    border-bottom: none;
+}
+
+/* Personalizar scrollbar */
+.lista-contenedor::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lista-contenedor::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+}
+
+.lista-contenedor::-webkit-scrollbar-thumb {
+    background-color: var(--rosa-secundario);
+    border-radius: 10px;
+}
+
+/* Estilos para los badges contadores */
+.badge.bg-rosa-claro {
+    padding: 5px 10px;
+    font-weight: 500;
+}
+
 /* Texto tachado */
 [style*="text-decoration: line-through"] {
     color: #6c757d;

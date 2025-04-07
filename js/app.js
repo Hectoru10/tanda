@@ -23,18 +23,18 @@ const tandaApp = {
     },
 
     // Inicialización
-    init: function() {
+    init: function () {
         this.bindEvents();
         this.loadData();
     },
 
     // Limpieza al salir
-    cleanup: function() {
+    cleanup: function () {
         this.unsubscribeAllListeners();
     },
 
     // Manejo de eventos
-    bindEvents: function() {
+    bindEvents: function () {
         // Eventos de Tandas
         document.getElementById('formularioTanda').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -65,7 +65,23 @@ const tandaApp = {
         });
 
         document.getElementById('btnConfirmarEliminar').addEventListener('click', () => {
-            this.eliminarParticipanteConfirmado();
+            const modal = document.getElementById('confirmarEliminarModal');
+            const tipo = modal.getAttribute('data-tipo');
+            
+            if (tipo === 'tanda') {
+                this.eliminarTandaConfirmada();
+            } else {
+                this.eliminarParticipanteConfirmado();
+            }
+        });
+
+        document.getElementById('btnEliminarTanda').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (this.currentTandaId) {
+                this.prepararEliminacionTanda();
+            } else {
+                this.mostrarAlerta('No hay tanda activa para eliminar', 'warning');
+            }
         });
 
         // Eventos de cierre de modales
@@ -79,13 +95,13 @@ const tandaApp = {
     },
 
     // Manejo de datos
-    loadData: function() {
+    loadData: function () {
         this.unsubscribeAllListeners();
         this.loadTandas();
         this.loadParticipantes();
     },
 
-    unsubscribeAllListeners: function() {
+    unsubscribeAllListeners: function () {
         Object.values(this.unsubscribeListeners).forEach(unsubscribe => {
             if (typeof unsubscribe === 'function') unsubscribe();
         });
@@ -97,7 +113,7 @@ const tandaApp = {
     },
 
     // Funciones de Tandas
-    registrarTanda: function() {
+    registrarTanda: function () {
         const form = document.getElementById('formularioTanda');
         const btn = form.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
@@ -141,13 +157,13 @@ const tandaApp = {
             });
     },
 
-    loadTandas: function() {
+    loadTandas: function () {
         const tablaTandas = document.getElementById('tablaTandas');
         const nuevaTandaBtn = document.querySelector('[data-bs-target="#nuevaTandaModal"]');
 
         this.unsubscribeListeners.proyectos = db.collection("proyectos").onSnapshot((snapshot) => {
             tablaTandas.innerHTML = '';
-            
+
             const tieneTandas = !snapshot.empty;
             nuevaTandaBtn.classList.toggle('disabled', tieneTandas);
             nuevaTandaBtn.setAttribute('aria-disabled', tieneTandas.toString());
@@ -164,7 +180,7 @@ const tandaApp = {
         });
     },
 
-    renderTandaInfo: function(tandaData) {
+    renderTandaInfo: function (tandaData) {
         const tablaTandas = document.getElementById('tablaTandas');
         const totalParticipantes = tandaData.participantes || 1;
 
@@ -230,10 +246,96 @@ const tandaApp = {
             tablaTandas.innerHTML = tandaHTML;
             this.actualizarSelectNumeros(totalParticipantes);
             this.setupEntregasListener(totalParticipantes);
+            this.cargarProximasAcciones(tandaData);
         });
     },
 
-    setupEntregasListener: function(totalParticipantes) {
+    renderProximasAcciones: function(pagosPendientes, proximoEnRecibir, siguienteEnRecibir) {
+        const listaPagosPendientes = document.getElementById('listaPagosPendientes');
+        const listaProximasEntregas = document.getElementById('listaProximasEntregas');
+        const contadorPendientes = document.getElementById('contadorPendientes');
+        const contadorEntregas = document.getElementById('contadorEntregas');
+        
+        // Actualizar contadores
+        contadorPendientes.textContent = pagosPendientes.length;
+        contadorEntregas.textContent = proximoEnRecibir ? 1 : 0;
+        
+        // Renderizar pagos pendientes (máximo 3 visibles inicialmente)
+        listaPagosPendientes.innerHTML = pagosPendientes.slice(0, 10).map(pago => {
+            return `<li>
+                <span>${pago.nombre} - $${pago.monto.toFixed(2)}</span>
+                <span class="text-muted small">Pendiente </span>
+            </li>`;
+        }).join('');
+        
+        if (pagosPendientes.length === 0) {
+            listaPagosPendientes.innerHTML = '<li class="text-muted">No hay pagos pendientes</li>';
+        } else if (pagosPendientes.length > 10) {
+            listaPagosPendientes.innerHTML += `<li class="text-center text-rosa-oscuro small">
+                +${pagosPendientes.length - 10} más...
+            </li>`;
+        }
+        
+        // Renderizar próximas entregas
+        if (proximoEnRecibir) {
+            listaProximasEntregas.innerHTML = `
+                <li>
+                    <span>${proximoEnRecibir.nombre}</span>
+                    <span>
+                        <span class="text-muted small">el ${proximoEnRecibir.fechaEntrega}</span>
+                        <span class="badge bg-rosa-primario text-white ms-2">$${proximoEnRecibir.monto.toFixed(2)}</span>
+                    </span</li>
+            `;
+            
+            if (siguienteEnRecibir) {
+                listaProximasEntregas.innerHTML += `
+                    <li>
+                        <span>${siguienteEnRecibir.nombre}</span>
+                        <span class="text-muted small">el ${siguienteEnRecibir.fechaEntrega}</span>
+                    </li>
+                `;
+            }
+        } else {
+            listaProximasEntregas.innerHTML = '<li class="text-muted">Tanda completada</li>';
+        }
+    },
+
+    
+
+
+// Y añade esta nueva función:
+marcarParticipanteComoPagado: function(numero) {
+    // Buscar el participante por número
+    db.collection("datos")
+        .where("numero", "==", parseInt(numero))
+        .get()
+        .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+                const doc = querySnapshot.docs[0];
+                return db.collection("datos").doc(doc.id).update({
+                    pagado: true
+                });
+            }
+        })
+        .then(() => {
+            this.mostrarAlerta('Participante marcado como pagado', 'success');
+            // Recargar los datos
+            db.collection("proyectos").limit(1).get().then((snapshot) => {
+                if (!snapshot.empty) {
+                    const doc = snapshot.docs[0];
+                    this.currentTandaId = doc.id;
+                    const data = doc.data();
+                    this.cargarProximasAcciones(data);
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error al marcar como pagado:", error);
+            this.mostrarAlerta('Error al marcar como pagado', 'danger');
+        });
+},
+
+    setupEntregasListener: function (totalParticipantes) {
         this.unsubscribeListeners.entregas = db.collection("datos").where("entregada", "==", true)
             .onSnapshot((snapshot) => {
                 const entregados = snapshot.size;
@@ -250,7 +352,7 @@ const tandaApp = {
             });
     },
 
-    cargarDatosParaEdicion: function() {
+    cargarDatosParaEdicion: function () {
         const btn = document.getElementById('btnGuardarCambiosTanda');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Cargando...';
@@ -284,7 +386,7 @@ const tandaApp = {
             });
     },
 
-    guardarCambiosTanda: function() {
+    guardarCambiosTanda: function () {
         const btn = document.getElementById('btnGuardarCambiosTanda');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
@@ -338,7 +440,7 @@ const tandaApp = {
     },
 
     // Funciones de Participantes
-    registrarParticipante: function() {
+    registrarParticipante: function () {
         const form = document.getElementById('formularioParticipantes');
         const btn = document.getElementById('btnGuardarParticipante');
         const originalText = btn.innerHTML;
@@ -377,9 +479,9 @@ const tandaApp = {
             });
     },
 
-    loadParticipantes: function() {
+    loadParticipantes: function () {
         const tablaCuerpo = document.getElementById('tablaCuerpo');
-        
+
         this.unsubscribeListeners.participantes = db.collection("datos")
             .orderBy("numero")
             .onSnapshot((querySnapshot) => {
@@ -390,12 +492,92 @@ const tandaApp = {
             });
     },
 
-    renderParticipantes: async function(querySnapshot) {
+    cargarProximasAcciones: async function (tandaData) {
+        try {
+            // Obtener participantes ordenados por número
+            const participantesSnapshot = await db.collection("datos")
+                .orderBy("numero")
+                .get();
+
+            // Obtener la fecha de inicio y frecuencia
+            const fechaInicio = new Date(tandaData.fechaInicio);
+            let diasPorCiclo = 0;
+            if (tandaData.frecuencia === 'Semanal') diasPorCiclo = 7;
+            else if (tandaData.frecuencia === 'Quincenal') diasPorCiclo = 15;
+            else if (tandaData.frecuencia === 'Mensual') diasPorCiclo = 30;
+
+            // Procesar participantes para encontrar:
+            // - Pagos pendientes (no pagados)
+            // - Próximo en recibir (primero no entregado)
+            const pagosPendientes = [];
+            let proximoEnRecibir = null;
+            let siguienteEnRecibir = null;
+
+            participantesSnapshot.forEach(doc => {
+                const data = doc.data();
+
+                // Calcular fecha de entrega
+                const fechaEntrega = new Date(fechaInicio);
+                fechaEntrega.setDate(fechaInicio.getDate() + (diasPorCiclo * (data.numero - 1)));
+
+                // Formatear fecha para mostrar
+                const opcionesFecha = { day: 'numeric', month: 'short' };
+                const fechaFormateada = fechaEntrega.toLocaleDateString('es-MX', opcionesFecha);
+
+                // Verificar si está pagado
+                if (!data.pagado) {
+                    pagosPendientes.push({
+                        nombre: data.nombre,
+                        monto: data.participacion === 'Completo' ?
+                            tandaData.montoPorParticipante :
+                            tandaData.montoPorParticipante / 2,
+                        fechaVencimiento: fechaFormateada,
+                        numero: data.numero
+                    });
+                }
+
+                // Verificar próximo en recibir (no entregado)
+                if (!data.entregada) {
+                    if (!proximoEnRecibir || data.numero < proximoEnRecibir.numero) {
+                        // Si encontramos un número menor que aún no ha recibido
+                        if (proximoEnRecibir) {
+                            siguienteEnRecibir = {
+                                nombre: proximoEnRecibir.nombre,
+                                fechaEntrega: proximoEnRecibir.fechaEntrega
+                            };
+                        }
+                        proximoEnRecibir = {
+                            nombre: data.nombre,
+                            monto: tandaData.montoPorParticipante * (tandaData.participantes - 1),
+                            fechaEntrega: fechaFormateada,
+                            numero: data.numero
+                        };
+                    } else if (!siguienteEnRecibir && data.numero > proximoEnRecibir.numero) {
+                        siguienteEnRecibir = {
+                            nombre: data.nombre,
+                            fechaEntrega: fechaFormateada
+                        };
+                    }
+                }
+            });
+
+            // Ordenar pagos pendientes por número (fecha)
+            pagosPendientes.sort((a, b) => a.numero - b.numero);
+
+            // Renderizar la sección de próximas acciones
+            this.renderProximasAcciones(pagosPendientes, proximoEnRecibir, siguienteEnRecibir);
+
+        } catch (error) {
+            console.error("Error al cargar próximas acciones:", error);
+        }
+    },
+
+    renderParticipantes: async function (querySnapshot) {
         const tablaCuerpo = document.getElementById('tablaCuerpo');
         const numeroSelect = document.getElementById('numero');
         const estadoNumeros = {};
         const filas = [];
-        
+
         // Resetear select
         Array.from(numeroSelect.options).forEach(opcion => {
             if (opcion.value) opcion.disabled = false;
@@ -410,7 +592,7 @@ const tandaApp = {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            
+
             // Actualizar estado de números
             if (!estadoNumeros[data.numero]) {
                 estadoNumeros[data.numero] = 0;
@@ -493,23 +675,44 @@ const tandaApp = {
         this.setupTableEvents();
     },
 
-    setupTableEvents: function() {
+    setupTableEvents: function () {
         // Eventos de checkboxes
+        // En la función setupTableEvents, modificar el evento del checkbox de pago:
         document.querySelectorAll('.check-pagado').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 const fila = e.target.closest('tr');
                 const id = fila.getAttribute('data-id');
                 const montoCell = fila.querySelector('.monto-participante');
                 montoCell.style.textDecoration = e.target.checked ? 'line-through' : 'none';
-                
+
                 db.collection("datos").doc(id).update({
                     pagado: e.target.checked
-                }).catch(error => {
-                    console.error("Error al actualizar estado de pago:", error);
-                    e.target.checked = !e.target.checked;
-                    montoCell.style.textDecoration = e.target.checked ? 'line-through' : 'none';
-                });
+                })
+                    .then(() => {
+                        // Recargar la tanda para actualizar próximas acciones
+                        db.collection("proyectos").limit(1).get().then((snapshot) => {
+                            if (!snapshot.empty) {
+                                const doc = snapshot.docs[0];
+                                this.currentTandaId = doc.id;
+                                const data = doc.data();
+                                this.cargarProximasAcciones(data);
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error al actualizar estado de pago:", error);
+                        e.target.checked = !e.target.checked;
+                        montoCell.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+                    });
             });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-marcar-pagado')) {
+                e.preventDefault();
+                const numeroParticipante = e.target.getAttribute('data-numero');
+                this.marcarParticipanteComoPagado(numeroParticipante);
+            }
         });
 
         document.querySelectorAll('.check-entregada').forEach(checkbox => {
@@ -518,7 +721,7 @@ const tandaApp = {
                 const id = fila.getAttribute('data-id');
                 const montoCell = fila.querySelector('.monto-entregar');
                 const fechaCell = fila.querySelector('.fecha-entrega');
-                
+
                 if (e.target.checked) {
                     fila.style.backgroundColor = '#e6ffed';
                     montoCell.style.textDecoration = 'line-through';
@@ -568,7 +771,7 @@ const tandaApp = {
         });
     },
 
-    cargarParticipanteParaEdicion: async function(id) {
+    cargarParticipanteParaEdicion: async function (id) {
         const modal = document.getElementById('editarParticipanteModal');
         const btn = modal.querySelector('#btnGuardarCambiosParticipante');
         const originalText = btn.innerHTML;
@@ -619,7 +822,7 @@ const tandaApp = {
         }
     },
 
-    guardarCambiosParticipante: function() {
+    guardarCambiosParticipante: function () {
         const modal = document.getElementById('editarParticipanteModal');
         const id = modal.getAttribute('data-id');
         const btn = document.getElementById('btnGuardarCambiosParticipante');
@@ -660,17 +863,64 @@ const tandaApp = {
             });
     },
 
-    prepararEliminacionParticipante: function(id, nombre) {
+    prepararEliminacionParticipante: function (id, nombre) {
         const modal = document.getElementById('confirmarEliminarModal');
         modal.setAttribute('data-id', id);
-        
+
         const mensaje = modal.querySelector('.modal-body p');
         mensaje.innerHTML = `¿Estás seguro de eliminar a <strong>${nombre}</strong>?<br>Esta acción no se puede deshacer.`;
+
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    },
+
+    prepararEliminacionTanda: function() {
+        const modal = document.getElementById('confirmarEliminarModal');
+        modal.setAttribute('data-tipo', 'tanda');
+        
+        document.getElementById('tituloConfirmacion').textContent = '¿Eliminar toda la tanda?';
+        document.getElementById('mensajeConfirmacion').innerHTML = 
+            'Esta acción eliminará la tanda y <strong>TODOS</strong> los participantes asociados.<br>Esta acción no se puede deshacer.';
         
         bootstrap.Modal.getOrCreateInstance(modal).show();
     },
 
-    eliminarParticipanteConfirmado: function() {
+    eliminarTandaConfirmada: function() {
+        const modal = document.getElementById('confirmarEliminarModal');
+        const btn = document.getElementById('btnConfirmarEliminar');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
+        btn.disabled = true;
+    
+        // Primero eliminamos todos los participantes
+        db.collection("datos").get().then(querySnapshot => {
+            const batch = db.batch();
+            querySnapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            return batch.commit();
+        })
+        .then(() => {
+            // Luego eliminamos la tanda
+            return db.collection("proyectos").doc(this.currentTandaId).delete();
+        })
+        .then(() => {
+            this.mostrarAlerta('Tanda eliminada correctamente', 'success');
+            this.currentTandaId = null;
+            bootstrap.Modal.getInstance(modal).hide();
+            this.cleanupModal('confirmarEliminarModal');
+            this.loadData(); // Esto recargará la vista mostrando el estado "sin tanda"
+        })
+        .catch(error => {
+            console.error("Error al eliminar tanda:", error);
+            this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    },
+
+    eliminarParticipanteConfirmado: function () {
         const modal = document.getElementById('confirmarEliminarModal');
         const id = modal.getAttribute('data-id');
         const btn = document.getElementById('btnConfirmarEliminar');
@@ -695,7 +945,7 @@ const tandaApp = {
     },
 
     // Funciones auxiliares
-    calcularFechaTermino: function(fechaInicio, frecuencia, participantes) {
+    calcularFechaTermino: function (fechaInicio, frecuencia, participantes) {
         const fecha = new Date(fechaInicio);
         let diasPorCiclo = 7; // Semanal por defecto
 
@@ -706,7 +956,7 @@ const tandaApp = {
         return fecha.toISOString().split('T')[0];
     },
 
-    actualizarSelectNumeros: function(participantes) {
+    actualizarSelectNumeros: function (participantes) {
         const numeroSelect = document.getElementById('numero');
         numeroSelect.innerHTML = '<option value="" disabled selected>Selecciona un número</option>';
 
@@ -715,7 +965,7 @@ const tandaApp = {
         }
     },
 
-    validarNumeroSeleccionado: function(numero) {
+    validarNumeroSeleccionado: function (numero) {
         const medioNumeroCheckbox = document.getElementById('medioNumero');
         const numeroSelect = document.getElementById('numero');
 
@@ -743,7 +993,7 @@ const tandaApp = {
         });
     },
 
-    cargarOpcionesEditar: function(maxParticipantes, estadoNumeros) {
+    cargarOpcionesEditar: function (maxParticipantes, estadoNumeros) {
         const select = document.getElementById('editarNumeroParticipante');
         select.innerHTML = '';
 
@@ -756,7 +1006,7 @@ const tandaApp = {
         }
     },
 
-    mostrarAlerta: function(mensaje, tipo) {
+    mostrarAlerta: function (mensaje, tipo) {
         const alerta = document.createElement('div');
         alerta.className = `alert alert-${tipo} alert-dismissible fade show fixed-top mx-auto mt-2`;
         alerta.style.width = '80%';
@@ -774,10 +1024,10 @@ const tandaApp = {
         }, 3000);
     },
 
-    cleanupModal: function(modalId) {
+    cleanupModal: function (modalId) {
         const modal = document.getElementById(modalId);
         modal.removeAttribute('data-id');
-        
+
         if (modalId === 'confirmarEliminarModal') {
             const mensaje = modal.querySelector('.modal-body p');
             mensaje.innerHTML = 'Esta acción no se puede deshacer y se perderán todos los datos asociados.';

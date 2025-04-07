@@ -30,7 +30,8 @@
                         <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#nuevaTandaModal" id="btnNuevaTanda">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#nuevaTandaModal"
+                            id="btnNuevaTanda">
                             <i class="fas fa-plus-circle me-1"></i> Nueva Tanda
                         </a>
                     </li>
@@ -48,7 +49,8 @@
                     <!-- Resumen de Tanda -->
                     <div class="col-md-4 border-end border-rosa-secundario" id="resumenTanda">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="text-rosa-oscuro mb-0"><i class="fas fa-info-circle me-2"></i>Resumen General</h5>
+                            <h5 class="text-rosa-oscuro mb-0"><i class="fas fa-info-circle me-2"></i>Resumen General
+                            </h5>
                             <div>
                                 <button class="btn btn-sm btn-outline-rosa-oscuro me-1" data-bs-toggle="modal"
                                     data-bs-target="#editarTandaModal" id="btnEditarTanda">
@@ -68,29 +70,45 @@
                     </div>
 
                     <!-- Próximas Acciones -->
-                    <div class="col-md-8">
-                        <h5 class="text-rosa-oscuro mb-3"><i class="fas fa-bell me-2"></i>Próximas Acciones</h5>
-                        <!-- Alertas de próximas acciones -->
-                        <div class="alert alert-pendiente d-flex align-items-center mb-3" id="alertPagosPendientes">
-                            <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
-                            <div>
-                                <strong>Pagos pendientes:</strong>
-                                <ul class="mb-0 mt-1" id="listaPagosPendientes">
-                                    <!-- Datos dinámicos -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-proximo d-flex align-items-center" id="alertProximoRecibir">
-                            <i class="fas fa-gift me-3 fs-4"></i>
-                            <div>
-                                <strong>Próximo en recibir:</strong>
-                                <div class="mt-1" id="infoProximoRecibir">
-                                    <!-- Datos dinámicos -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div class="col-md-8">
+    <h5 class="text-rosa-oscuro mb-3"><i class="fas fa-bell me-2"></i>Próximas Acciones</h5>
+    
+    <!-- Pagos Pendientes -->
+    <div class="alert alert-pendiente d-flex align-items-start mb-3 p-3">
+        <i class="fas fa-exclamation-triangle me-3 fs-4 mt-1"></i>
+        <div class="w-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Pagos pendientes</strong>
+                <span class="badge bg-rosa-claro text-rosa-oscuro">
+                    <span id="contadorPendientes">0</span> pendientes
+                </span>
+            </div>
+            <div class="lista-contenedor">
+                <ul id="listaPagosPendientes" class="mb-0 lista-scroll">
+                    <!-- Se llenará dinámicamente -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Próximas Entregas -->
+    <div class="alert alert-proximo d-flex align-items-start p-3">
+        <i class="fas fa-gift me-3 fs-4 mt-1"></i>
+        <div class="w-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Próximas entregas</strong>
+                <span class="badge bg-rosa-claro text-rosa-oscuro">
+                    <span id="contadorEntregas">0</span> por entregar
+                </span>
+            </div>
+            <div class="lista-contenedor">
+                <ul id="listaProximasEntregas" class="mb-0 lista-scroll">
+                    <!-- Se llenará dinámicamente -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
                 </div>
             </div>
         </div>
@@ -131,7 +149,8 @@
     </div>
 
     <!-- Modal para nueva tanda -->
-    <div class="modal fade" id="nuevaTandaModal" tabindex="-1" aria-labelledby="nuevaTandaModalLabel" aria-hidden="true">
+    <div class="modal fade" id="nuevaTandaModal" tabindex="-1" aria-labelledby="nuevaTandaModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-rosa-primario text-white">
@@ -238,7 +257,8 @@
                     <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </button>
-                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarTanda" form="formularioTanda">
+                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarTanda"
+                        form="formularioTanda">
                         <i class="fas fa-save me-2"></i>Guardar Tanda
                     </button>
                 </div>
@@ -247,7 +267,8 @@
     </div>
 
     <!-- Modal para editar tanda -->
-    <div class="modal fade" id="editarTandaModal" tabindex="-1" aria-labelledby="editarTandaModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editarTandaModal" tabindex="-1" aria-labelledby="editarTandaModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-rosa-primario text-white">
@@ -353,7 +374,8 @@
                     <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </button>
-                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarCambiosTanda" form="formEditarTanda">
+                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarCambiosTanda"
+                        form="formEditarTanda">
                         <i class="fas fa-save me-2"></i>Guardar Cambios
                     </button>
                 </div>
@@ -423,7 +445,8 @@
                     <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </button>
-                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarParticipante" form="formularioParticipantes">
+                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarParticipante"
+                        form="formularioParticipantes">
                         <i class="fas fa-save me-2"></i>Guardar Participante
                     </button>
                 </div>
@@ -471,7 +494,8 @@
                                 <span class="input-group-text bg-rosa-claro">
                                     <i class="fas fa-signature text-rosa-oscuro"></i>
                                 </span>
-                                <input type="text" class="form-control" id="editarNombreParticipante" required minlength="3">
+                                <input type="text" class="form-control" id="editarNombreParticipante" required
+                                    minlength="3">
                                 <div class="invalid-feedback">
                                     Ingresa un nombre válido (mínimo 3 caracteres)
                                 </div>
@@ -493,7 +517,8 @@
                     <button type="button" class="btn btn-outline-rosa-oscuro" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </button>
-                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarCambiosParticipante" form="formEditarParticipante">
+                    <button type="submit" class="btn bg-rosa-primario text-white" id="btnGuardarCambiosParticipante"
+                        form="formEditarParticipante">
                         <i class="fas fa-save me-2"></i>Guardar Cambios
                     </button>
                 </div>
@@ -502,32 +527,32 @@
     </div>
 
     <!-- Modal Confirmación Eliminar -->
-    <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <i class="fas fa-user-times fa-4x text-danger mb-3"></i>
-                    <h5 class="mb-3">¿Confirmar eliminación?</h5>
-                    <p class="text-muted" id="mensajeConfirmacion"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Cancelar
-                    </button>
-                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
-                        <i class="fas fa-trash-alt me-2"></i>Confirmar
-                    </button>
-                </div>
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
+                <h5 class="mb-3" id="tituloConfirmacion">¿Confirmar eliminación?</h5>
+                <p class="text-muted" id="mensajeConfirmacion"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                    <i class="fas fa-trash-alt me-2"></i>Confirmar
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Pie de página -->
     <footer class="bg-rosa-oscuro text-white py-3 mt-5">
@@ -544,7 +569,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <!-- Archivo JS personalizado -->
     <script src="js/app.js"></script>
-    
+
     <script>
         // Actualizar año en el footer
         document.getElementById('currentYear').textContent = new Date().getFullYear();
