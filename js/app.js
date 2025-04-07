@@ -38,7 +38,7 @@ const tandaApp = {
         // Eventos de Tandas
         document.getElementById('formularioTanda').addEventListener('submit', (e) => {
             e.preventDefault();
-            this.registrarTanda();
+            this.registrarTanda(e);
         });
 
         // Eventos de Participantes
@@ -67,7 +67,7 @@ const tandaApp = {
         document.getElementById('btnConfirmarEliminar').addEventListener('click', () => {
             const modal = document.getElementById('confirmarEliminarModal');
             const tipo = modal.getAttribute('data-tipo');
-            
+
             if (tipo === 'tanda') {
                 this.eliminarTandaConfirmada();
             } else {
@@ -113,15 +113,29 @@ const tandaApp = {
     },
 
     // Funciones de Tandas
-    registrarTanda: function () {
+    registrarTanda: function (e) {
+        e.preventDefault();
         const form = document.getElementById('formularioTanda');
-        const btn = form.querySelector('button[type="submit"]');
+        const btn = document.getElementById('btnGuardarTanda');
         const originalText = btn.innerHTML;
 
+        // Validación manual adicional
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
+            btn.innerHTML = originalText;
             return;
         }
+
+        // Validar fecha no sea en el pasado
+        /*const fechaInicio = new Date(document.getElementById('fechaInicio').value);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        if (fechaInicio < hoy) {
+            this.mostrarAlerta('La fecha de inicio no puede ser en el pasado', 'warning');
+            btn.innerHTML = originalText;
+            return;
+        }*/
 
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registrando...';
         btn.disabled = true;
@@ -132,19 +146,31 @@ const tandaApp = {
             participantes: parseInt(document.getElementById('numParticipantes').value),
             frecuencia: document.getElementById('frecuenciaPagos').value,
             fechaInicio: document.getElementById('fechaInicio').value,
-            fechaTermino: this.calcularFechaTermino(
-                document.getElementById('fechaInicio').value,
-                document.getElementById('frecuenciaPagos').value,
-                parseInt(document.getElementById('numParticipantes').value))
+            fechaCreacion: firebase.firestore.FieldValue.serverTimestamp(),
+            estado: 'activa'
         };
 
+        // Calcular fecha de término
+        tandaData.fechaTermino = this.calcularFechaTermino(
+            tandaData.fechaInicio,
+            tandaData.frecuencia,
+            tandaData.participantes
+        );
+
+        // Calcular monto total
         tandaData.montoTotal = tandaData.montoPorParticipante * (tandaData.participantes - 1);
 
         db.collection("proyectos").add(tandaData)
-            .then(() => {
+            .then((docRef) => {
+                this.currentTandaId = docRef.id;
                 this.mostrarAlerta('Tanda creada correctamente', 'success');
+
+                // Resetear y cerrar el modal
                 form.reset();
                 form.classList.remove('was-validated');
+                bootstrap.Modal.getInstance(document.getElementById('nuevaTandaModal')).hide();
+
+                // Actualizar la UI
                 this.loadData();
             })
             .catch(error => {
@@ -250,16 +276,16 @@ const tandaApp = {
         });
     },
 
-    renderProximasAcciones: function(pagosPendientes, proximoEnRecibir, siguienteEnRecibir) {
+    renderProximasAcciones: function (pagosPendientes, proximoEnRecibir, siguienteEnRecibir) {
         const listaPagosPendientes = document.getElementById('listaPagosPendientes');
         const listaProximasEntregas = document.getElementById('listaProximasEntregas');
         const contadorPendientes = document.getElementById('contadorPendientes');
         const contadorEntregas = document.getElementById('contadorEntregas');
-        
+
         // Actualizar contadores
         contadorPendientes.textContent = pagosPendientes.length;
         contadorEntregas.textContent = proximoEnRecibir ? 1 : 0;
-        
+
         // Renderizar pagos pendientes (máximo 3 visibles inicialmente)
         listaPagosPendientes.innerHTML = pagosPendientes.slice(0, 10).map(pago => {
             return `<li>
@@ -267,7 +293,7 @@ const tandaApp = {
                 <span class="text-muted small">Pendiente </span>
             </li>`;
         }).join('');
-        
+
         if (pagosPendientes.length === 0) {
             listaPagosPendientes.innerHTML = '<li class="text-muted">No hay pagos pendientes</li>';
         } else if (pagosPendientes.length > 10) {
@@ -275,7 +301,7 @@ const tandaApp = {
                 +${pagosPendientes.length - 10} más...
             </li>`;
         }
-        
+
         // Renderizar próximas entregas
         if (proximoEnRecibir) {
             listaProximasEntregas.innerHTML = `
@@ -286,7 +312,7 @@ const tandaApp = {
                         <span class="badge bg-rosa-primario text-white ms-2">$${proximoEnRecibir.monto.toFixed(2)}</span>
                     </span</li>
             `;
-            
+
             if (siguienteEnRecibir) {
                 listaProximasEntregas.innerHTML += `
                     <li>
@@ -300,40 +326,40 @@ const tandaApp = {
         }
     },
 
-    
 
 
-// Y añade esta nueva función:
-marcarParticipanteComoPagado: function(numero) {
-    // Buscar el participante por número
-    db.collection("datos")
-        .where("numero", "==", parseInt(numero))
-        .get()
-        .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
-                const doc = querySnapshot.docs[0];
-                return db.collection("datos").doc(doc.id).update({
-                    pagado: true
-                });
-            }
-        })
-        .then(() => {
-            this.mostrarAlerta('Participante marcado como pagado', 'success');
-            // Recargar los datos
-            db.collection("proyectos").limit(1).get().then((snapshot) => {
-                if (!snapshot.empty) {
-                    const doc = snapshot.docs[0];
-                    this.currentTandaId = doc.id;
-                    const data = doc.data();
-                    this.cargarProximasAcciones(data);
+
+    // Y añade esta nueva función:
+    marcarParticipanteComoPagado: function (numero) {
+        // Buscar el participante por número
+        db.collection("datos")
+            .where("numero", "==", parseInt(numero))
+            .get()
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    const doc = querySnapshot.docs[0];
+                    return db.collection("datos").doc(doc.id).update({
+                        pagado: true
+                    });
                 }
+            })
+            .then(() => {
+                this.mostrarAlerta('Participante marcado como pagado', 'success');
+                // Recargar los datos
+                db.collection("proyectos").limit(1).get().then((snapshot) => {
+                    if (!snapshot.empty) {
+                        const doc = snapshot.docs[0];
+                        this.currentTandaId = doc.id;
+                        const data = doc.data();
+                        this.cargarProximasAcciones(data);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error al marcar como pagado:", error);
+                this.mostrarAlerta('Error al marcar como pagado', 'danger');
             });
-        })
-        .catch(error => {
-            console.error("Error al marcar como pagado:", error);
-            this.mostrarAlerta('Error al marcar como pagado', 'danger');
-        });
-},
+    },
 
     setupEntregasListener: function (totalParticipantes) {
         this.unsubscribeListeners.entregas = db.collection("datos").where("entregada", "==", true)
@@ -873,24 +899,24 @@ marcarParticipanteComoPagado: function(numero) {
         bootstrap.Modal.getOrCreateInstance(modal).show();
     },
 
-    prepararEliminacionTanda: function() {
+    prepararEliminacionTanda: function () {
         const modal = document.getElementById('confirmarEliminarModal');
         modal.setAttribute('data-tipo', 'tanda');
-        
+
         document.getElementById('tituloConfirmacion').textContent = '¿Eliminar toda la tanda?';
-        document.getElementById('mensajeConfirmacion').innerHTML = 
+        document.getElementById('mensajeConfirmacion').innerHTML =
             'Esta acción eliminará la tanda y <strong>TODOS</strong> los participantes asociados.<br>Esta acción no se puede deshacer.';
-        
+
         bootstrap.Modal.getOrCreateInstance(modal).show();
     },
 
-    eliminarTandaConfirmada: function() {
+    eliminarTandaConfirmada: function () {
         const modal = document.getElementById('confirmarEliminarModal');
         const btn = document.getElementById('btnConfirmarEliminar');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
         btn.disabled = true;
-    
+
         // Primero eliminamos todos los participantes
         db.collection("datos").get().then(querySnapshot => {
             const batch = db.batch();
@@ -899,25 +925,25 @@ marcarParticipanteComoPagado: function(numero) {
             });
             return batch.commit();
         })
-        .then(() => {
-            // Luego eliminamos la tanda
-            return db.collection("proyectos").doc(this.currentTandaId).delete();
-        })
-        .then(() => {
-            this.mostrarAlerta('Tanda eliminada correctamente', 'success');
-            this.currentTandaId = null;
-            bootstrap.Modal.getInstance(modal).hide();
-            this.cleanupModal('confirmarEliminarModal');
-            this.loadData(); // Esto recargará la vista mostrando el estado "sin tanda"
-        })
-        .catch(error => {
-            console.error("Error al eliminar tanda:", error);
-            this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
-        })
-        .finally(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        });
+            .then(() => {
+                // Luego eliminamos la tanda
+                return db.collection("proyectos").doc(this.currentTandaId).delete();
+            })
+            .then(() => {
+                this.mostrarAlerta('Tanda eliminada correctamente', 'success');
+                this.currentTandaId = null;
+                bootstrap.Modal.getInstance(modal).hide();
+                this.cleanupModal('confirmarEliminarModal');
+                this.loadData(); // Esto recargará la vista mostrando el estado "sin tanda"
+            })
+            .catch(error => {
+                console.error("Error al eliminar tanda:", error);
+                this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
     },
 
     eliminarParticipanteConfirmado: function () {
