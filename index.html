@@ -53,11 +53,11 @@
                             </h5>
                             <div>
                                 <button class="btn btn-sm btn-outline-rosa-oscuro me-1" data-bs-toggle="modal"
-                                    data-bs-target="#editarTandaModal" id="btnEditarTanda">
+                                    data-bs-target="#editarTandaModal" id="btnEditarTanda" disabled>
                                     <i class="fas fa-edit me-1"></i>Editar
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                    data-bs-target="#confirmarEliminarModal" id="btnEliminarTanda">
+                                    data-bs-target="#confirmarEliminarModal" id="btnEliminarTanda" disabled>
                                     <i class="fas fa-trash-alt me-1"></i>Eliminar
                                 </button>
                             </div>
@@ -70,45 +70,45 @@
                     </div>
 
                     <!-- Próximas Acciones -->
-<div class="col-md-8">
-    <h5 class="text-rosa-oscuro mb-3"><i class="fas fa-bell me-2"></i>Próximas Acciones</h5>
-    
-    <!-- Pagos Pendientes -->
-    <div class="alert alert-pendiente d-flex align-items-start mb-3 p-3">
-        <i class="fas fa-exclamation-triangle me-3 fs-4 mt-1"></i>
-        <div class="w-100">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong>Pagos pendientes</strong>
-                <span class="badge bg-rosa-claro text-rosa-oscuro">
-                    <span id="contadorPendientes">0</span> pendientes
-                </span>
-            </div>
-            <div class="lista-contenedor">
-                <ul id="listaPagosPendientes" class="mb-0 lista-scroll">
-                    <!-- Se llenará dinámicamente -->
-                </ul>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Próximas Entregas -->
-    <div class="alert alert-proximo d-flex align-items-start p-3">
-        <i class="fas fa-gift me-3 fs-4 mt-1"></i>
-        <div class="w-100">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong>Próximas entregas</strong>
-                <span class="badge bg-rosa-claro text-rosa-oscuro">
-                    <span id="contadorEntregas">0</span> por entregar
-                </span>
-            </div>
-            <div class="lista-contenedor">
-                <ul id="listaProximasEntregas" class="mb-0 lista-scroll">
-                    <!-- Se llenará dinámicamente -->
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+                    <div class="col-md-8">
+                        <h5 class="text-rosa-oscuro mb-3"><i class="fas fa-bell me-2"></i>Próximas Acciones</h5>
+
+                        <!-- Pagos Pendientes -->
+                        <div class="alert alert-pendiente d-flex align-items-start mb-3 p-3">
+                            <i class="fas fa-exclamation-triangle me-3 fs-4 mt-1"></i>
+                            <div class="w-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Pagos pendientes</strong>
+                                    <span class="badge bg-rosa-claro text-rosa-oscuro">
+                                        <span id="contadorPendientes">0</span> pendientes
+                                    </span>
+                                </div>
+                                <div class="lista-contenedor">
+                                    <ul id="listaPagosPendientes" class="mb-0 lista-scroll">
+                                        <!-- Se llenará dinámicamente -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Próximas Entregas -->
+                        <div class="alert alert-proximo d-flex align-items-start p-3">
+                            <i class="fas fa-gift me-3 fs-4 mt-1"></i>
+                            <div class="w-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Próximas entregas</strong>
+                                    <span class="badge bg-rosa-claro text-rosa-oscuro">
+                                        <span id="contadorEntregas">0</span> por entregar
+                                    </span>
+                                </div>
+                                <div class="lista-contenedor">
+                                    <ul id="listaProximasEntregas" class="mb-0 lista-scroll">
+                                        <!-- Se llenará dinámicamente -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,7 +118,7 @@
             <div class="card-header bg-rosa-primario text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-users me-2"></i>Participantes Registrados</h5>
                 <button class="btn btn-sm bg-rosa-oscuro text-white" data-bs-toggle="modal"
-                    data-bs-target="#nuevoParticipante" id="btnAgregarParticipante">
+                    data-bs-target="#nuevoParticipante" id="btnAgregarParticipante" disabled>
                     <i class="fas fa-user-plus me-1"></i> Agregar
                 </button>
             </div>
@@ -527,32 +527,32 @@
     </div>
 
     <!-- Modal Confirmación Eliminar -->
-<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
-                <h5 class="mb-3" id="tituloConfirmacion">¿Confirmar eliminación?</h5>
-                <p class="text-muted" id="mensajeConfirmacion"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancelar
-                </button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
-                    <i class="fas fa-trash-alt me-2"></i>Confirmar
-                </button>
+    <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
+                    <h5 class="mb-3" id="tituloConfirmacion">¿Confirmar eliminación?</h5>
+                    <p class="text-muted" id="mensajeConfirmacion"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                        <i class="fas fa-trash-alt me-2"></i>Confirmar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Pie de página -->
     <footer class="bg-rosa-oscuro text-white py-3 mt-5">

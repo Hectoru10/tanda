@@ -18,18 +18,42 @@ body {
 }
 
 /* Clases de colores */
-.bg-rosa-primario { background-color: var(--rosa-primario) !important; }
-.bg-rosa-secundario { background-color: var(--rosa-secundario) !important; }
-.bg-rosa-oscuro { background-color: var(--rosa-oscuro) !important; }
-.bg-rosa-claro { background-color: var(--rosa-claro) !important; }
-.bg-rosa-muy-claro { background-color: var(--rosa-muy-claro) !important; }
+.bg-rosa-primario {
+    background-color: var(--rosa-primario) !important;
+}
 
-.text-rosa-primario { color: var(--rosa-primario) !important; }
-.text-rosa-secundario { color: var(--rosa-secundario) !important; }
-.text-rosa-oscuro { color: var(--rosa-oscuro) !important; }
+.bg-rosa-secundario {
+    background-color: var(--rosa-secundario) !important;
+}
+
+.bg-rosa-oscuro {
+    background-color: var(--rosa-oscuro) !important;
+}
+
+.bg-rosa-claro {
+    background-color: var(--rosa-claro) !important;
+}
+
+.bg-rosa-muy-claro {
+    background-color: var(--rosa-muy-claro) !important;
+}
+
+.text-rosa-primario {
+    color: var(--rosa-primario) !important;
+}
+
+.text-rosa-secundario {
+    color: var(--rosa-secundario) !important;
+}
+
+.text-rosa-oscuro {
+    color: var(--rosa-oscuro) !important;
+}
 
 /* Bordes */
-.border-rosa-secundario { border-color: var(--rosa-secundario) !important; }
+.border-rosa-secundario {
+    border-color: var(--rosa-secundario) !important;
+}
 
 /* Componentes */
 .card {
@@ -108,14 +132,16 @@ body {
 }
 
 /* Formularios */
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: var(--border-radius-general);
     padding: 0.5rem 1rem;
     border: 1px solid #dee2e6;
     transition: var(--transition-general);
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: var(--rosa-secundario);
     box-shadow: 0 0 0 0.25rem rgba(232, 62, 140, 0.25);
 }
@@ -237,7 +263,7 @@ body {
 
 #listaPagosPendientes li {
     padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -249,7 +275,8 @@ body {
 
 /* Estilos para las listas con scroll */
 .lista-contenedor {
-    max-height: 150px; /* Altura para mostrar aproximadamente 3 ítems */
+    max-height: 150px;
+    /* Altura para mostrar aproximadamente 3 ítems */
     overflow-y: auto;
     padding-right: 8px;
 }
@@ -262,7 +289,7 @@ body {
 
 .lista-scroll li {
     padding: 8px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     display: flex;
     justify-content: space-between;
 }
@@ -277,7 +304,7 @@ body {
 }
 
 .lista-contenedor::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.05);
     border-radius: 10px;
 }
 
@@ -301,18 +328,18 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .card-body .row > .col-md-4 {
+    .card-body .row>.col-md-4 {
         border-end: none !important;
         border-bottom: 1px solid var(--rosa-secundario);
         padding-bottom: 1rem;
         margin-bottom: 1rem;
     }
-    
+
     .table-responsive {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .navbar-brand {
         font-size: 1rem;
     }
@@ -332,13 +359,40 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Estilos para botones deshabilitados */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-outline-rosa-oscuro:disabled {
+    color: var(--rosa-oscuro);
+    background-color: transparent;
+    border-color: var(--rosa-oscuro);
+    opacity: 0.6;
+}
+
+.btn-outline-danger:disabled {
+    color: #dc3545;
+    background-color: transparent;
+    border-color: #dc3545;
+    opacity: 0.6;
+}
+
+.bg-rosa-oscuro:disabled {
+    background-color: var(--rosa-oscuro) !important;
+    opacity: 0.6;
+}
+
 @media (max-width: 576px) {
     .btn-floating {
         display: flex;
         align-items: center;
         justify-content: center;
     }
-    
+
     .modal-dialog {
         margin: 1rem auto;
     }
@@ -346,8 +400,15 @@ body {
 
 /* Animaciones */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in {

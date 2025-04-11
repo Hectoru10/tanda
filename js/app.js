@@ -183,14 +183,20 @@ const tandaApp = {
             });
     },
 
+    // Función loadTandas()
     loadTandas: function () {
         const tablaTandas = document.getElementById('tablaTandas');
         const nuevaTandaBtn = document.querySelector('[data-bs-target="#nuevaTandaModal"]');
+        const editarTandaBtn = document.getElementById('btnEditarTanda');
+        const eliminarTandaBtn = document.getElementById('btnEliminarTanda');
+        const agregarParticipanteBtn = document.getElementById('btnAgregarParticipante');
 
         this.unsubscribeListeners.proyectos = db.collection("proyectos").onSnapshot((snapshot) => {
             tablaTandas.innerHTML = '';
 
             const tieneTandas = !snapshot.empty;
+
+            // Controlar estado de los botones
             nuevaTandaBtn.classList.toggle('disabled', tieneTandas);
             nuevaTandaBtn.setAttribute('aria-disabled', tieneTandas.toString());
 
@@ -199,6 +205,31 @@ const tandaApp = {
                 this.currentTandaId = doc.id;
                 const data = doc.data();
                 this.renderTandaInfo(data);
+
+                // Habilitar botones cuando hay tanda
+                editarTandaBtn.disabled = false;
+                eliminarTandaBtn.disabled = false;
+                agregarParticipanteBtn.disabled = false;
+            } else {
+                this.currentTandaId = null;
+
+                // Deshabilitar botones cuando no hay tanda
+                editarTandaBtn.disabled = true;
+                eliminarTandaBtn.disabled = true;
+                agregarParticipanteBtn.disabled = true;
+
+                // Mostrar mensaje de que no hay tandas
+                tablaTandas.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-hand-holding-heart fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay tandas activas</h5>
+                    <p class="small">Crea una nueva tanda para comenzar</p>
+                    <button class="btn btn-sm bg-rosa-primario text-white" data-bs-toggle="modal" 
+                            data-bs-target="#nuevaTandaModal">
+                        <i class="fas fa-plus-circle me-1"></i> Crear Tanda
+                    </button>
+                </div>
+            `;
             }
         }, error => {
             console.error("Error al cargar tandas:", error);
@@ -326,10 +357,60 @@ const tandaApp = {
         }
     },
 
+    
+    // Función independiente para actualizar estado de botones
+actualizarEstadoBotones: function(habilitar) {
+    const editarTandaBtn = document.getElementById('btnEditarTanda');
+    const eliminarTandaBtn = document.getElementById('btnEliminarTanda');
+    const agregarParticipanteBtn = document.getElementById('btnAgregarParticipante');
+    
+    if (editarTandaBtn) editarTandaBtn.disabled = !habilitar;
+    if (eliminarTandaBtn) eliminarTandaBtn.disabled = !habilitar;
+    if (agregarParticipanteBtn) agregarParticipanteBtn.disabled = !habilitar;
+},
+
+// Función separada para eliminar tanda
+eliminarTandaConfirmada: function() {
+    const modal = document.getElementById('confirmarEliminarModal');
+    const btn = document.getElementById('btnConfirmarEliminar');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
+    btn.disabled = true;
+
+    // Primero eliminamos todos los participantes
+    db.collection("datos").get().then(querySnapshot => {
+        const batch = db.batch();
+        querySnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        return batch.commit();
+    })
+    .then(() => {
+        // Luego eliminamos la tanda
+        return db.collection("proyectos").doc(this.currentTandaId).delete();
+    })
+    .then(() => {
+        this.mostrarAlerta('Tanda eliminada correctamente', 'success');
+        this.currentTandaId = null;
+        
+        // Actualizar estado de botones después de eliminar
+        this.actualizarEstadoBotones(false);
+        
+        bootstrap.Modal.getInstance(modal).hide();
+        this.cleanupModal('confirmarEliminarModal');
+        this.loadData(); // Recargar la vista
+    })
+    .catch(error => {
+        console.error("Error al eliminar tanda:", error);
+        this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+},
 
 
-
-    // Y añade esta nueva función:
     marcarParticipanteComoPagado: function (numero) {
         // Buscar el participante por número
         db.collection("datos")
@@ -910,13 +991,13 @@ const tandaApp = {
         bootstrap.Modal.getOrCreateInstance(modal).show();
     },
 
-    eliminarTandaConfirmada: function () {
+    eliminarTandaConfirmada: function() {
         const modal = document.getElementById('confirmarEliminarModal');
         const btn = document.getElementById('btnConfirmarEliminar');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
         btn.disabled = true;
-
+    
         // Primero eliminamos todos los participantes
         db.collection("datos").get().then(querySnapshot => {
             const batch = db.batch();
@@ -925,25 +1006,30 @@ const tandaApp = {
             });
             return batch.commit();
         })
-            .then(() => {
-                // Luego eliminamos la tanda
-                return db.collection("proyectos").doc(this.currentTandaId).delete();
-            })
-            .then(() => {
-                this.mostrarAlerta('Tanda eliminada correctamente', 'success');
-                this.currentTandaId = null;
-                bootstrap.Modal.getInstance(modal).hide();
-                this.cleanupModal('confirmarEliminarModal');
-                this.loadData(); // Esto recargará la vista mostrando el estado "sin tanda"
-            })
-            .catch(error => {
-                console.error("Error al eliminar tanda:", error);
-                this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
-            })
-            .finally(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
+        .then(() => {
+            // Luego eliminamos la tanda
+            return db.collection("proyectos").doc(this.currentTandaId).delete();
+        })
+        .then(() => {
+            this.mostrarAlerta('Tanda eliminada correctamente', 'success');
+            this.currentTandaId = null;
+            bootstrap.Modal.getInstance(modal).hide();
+            this.cleanupModal('confirmarEliminarModal');
+            
+            // Deshabilitar botones después de eliminar
+            this.actualizarEstadoBotones(false);
+            
+            // Recargar datos
+            this.loadData();
+        })
+        .catch(error => {
+            console.error("Error al eliminar tanda:", error);
+            this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
     },
 
     eliminarParticipanteConfirmado: function () {
