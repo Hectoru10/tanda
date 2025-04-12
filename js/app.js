@@ -1,17 +1,3 @@
-// Configuración de Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyDH1mEOU4mVLQpZmNCcrZKTa39tXz_n0-4",
-    authDomain: "tandas-3f8b5.firebaseapp.com",
-    projectId: "tandas-3f8b5",
-    storageBucket: "tandas-3f8b5.appspot.com",
-    messagingSenderId: "456682743605",
-    appId: "1:456682743605:web:614d485da44808b7e78e7c"
-};
-
-// Inicializa Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
 // Objeto principal de la aplicación
 const tandaApp = {
     // Estado de la aplicación
@@ -126,17 +112,6 @@ const tandaApp = {
             return;
         }
 
-        // Validar fecha no sea en el pasado
-        /*const fechaInicio = new Date(document.getElementById('fechaInicio').value);
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
-        if (fechaInicio < hoy) {
-            this.mostrarAlerta('La fecha de inicio no puede ser en el pasado', 'warning');
-            btn.innerHTML = originalText;
-            return;
-        }*/
-
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registrando...';
         btn.disabled = true;
 
@@ -183,7 +158,6 @@ const tandaApp = {
             });
     },
 
-    // Función loadTandas()
     loadTandas: function () {
         const tablaTandas = document.getElementById('tablaTandas');
         const nuevaTandaBtn = document.querySelector('[data-bs-target="#nuevaTandaModal"]');
@@ -357,59 +331,15 @@ const tandaApp = {
         }
     },
 
-    
-    // Función independiente para actualizar estado de botones
-actualizarEstadoBotones: function(habilitar) {
-    const editarTandaBtn = document.getElementById('btnEditarTanda');
-    const eliminarTandaBtn = document.getElementById('btnEliminarTanda');
-    const agregarParticipanteBtn = document.getElementById('btnAgregarParticipante');
-    
-    if (editarTandaBtn) editarTandaBtn.disabled = !habilitar;
-    if (eliminarTandaBtn) eliminarTandaBtn.disabled = !habilitar;
-    if (agregarParticipanteBtn) agregarParticipanteBtn.disabled = !habilitar;
-},
-
-// Función separada para eliminar tanda
-eliminarTandaConfirmada: function() {
-    const modal = document.getElementById('confirmarEliminarModal');
-    const btn = document.getElementById('btnConfirmarEliminar');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
-    btn.disabled = true;
-
-    // Primero eliminamos todos los participantes
-    db.collection("datos").get().then(querySnapshot => {
-        const batch = db.batch();
-        querySnapshot.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-        return batch.commit();
-    })
-    .then(() => {
-        // Luego eliminamos la tanda
-        return db.collection("proyectos").doc(this.currentTandaId).delete();
-    })
-    .then(() => {
-        this.mostrarAlerta('Tanda eliminada correctamente', 'success');
-        this.currentTandaId = null;
+    actualizarEstadoBotones: function(habilitar) {
+        const editarTandaBtn = document.getElementById('btnEditarTanda');
+        const eliminarTandaBtn = document.getElementById('btnEliminarTanda');
+        const agregarParticipanteBtn = document.getElementById('btnAgregarParticipante');
         
-        // Actualizar estado de botones después de eliminar
-        this.actualizarEstadoBotones(false);
-        
-        bootstrap.Modal.getInstance(modal).hide();
-        this.cleanupModal('confirmarEliminarModal');
-        this.loadData(); // Recargar la vista
-    })
-    .catch(error => {
-        console.error("Error al eliminar tanda:", error);
-        this.mostrarAlerta('Error al eliminar tanda: ' + error.message, 'danger');
-    })
-    .finally(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    });
-},
-
+        if (editarTandaBtn) editarTandaBtn.disabled = !habilitar;
+        if (eliminarTandaBtn) eliminarTandaBtn.disabled = !habilitar;
+        if (agregarParticipanteBtn) agregarParticipanteBtn.disabled = !habilitar;
+    },
 
     marcarParticipanteComoPagado: function (numero) {
         // Buscar el participante por número
@@ -784,7 +714,6 @@ eliminarTandaConfirmada: function() {
 
     setupTableEvents: function () {
         // Eventos de checkboxes
-        // En la función setupTableEvents, modificar el evento del checkbox de pago:
         document.querySelectorAll('.check-pagado').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 const fila = e.target.closest('tr');
@@ -1064,7 +993,7 @@ eliminarTandaConfirmada: function() {
         if (frecuencia === 'Quincenal') diasPorCiclo = 15;
         else if (frecuencia === 'Mensual') diasPorCiclo = 30;
 
-        fecha.setDate(fecha.getDate() + (diasPorCiclo * participantes));
+        fecha.setDate(fecha.getDate() + (diasPorCiclo * (participantes - 1)));
         return fecha.toISOString().split('T')[0];
     },
 

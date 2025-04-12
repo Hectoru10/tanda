@@ -276,7 +276,6 @@ body {
 /* Estilos para las listas con scroll */
 .lista-contenedor {
     max-height: 150px;
-    /* Altura para mostrar aproximadamente 3 ítems */
     overflow-y: auto;
     padding-right: 8px;
 }
