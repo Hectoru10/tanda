@@ -27,15 +27,6 @@ const tandaApp = {
             this.registrarTanda(e);
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LfHkGArAAAAAIuz_p3FAa052G5WtnokurXSVZq8', {action: 'submit'}).then(function(token) {
-            console.log("reCAPTCHA Token:", token);
-        });
-    });
-});
-
-
         // Eventos de Participantes
         document.getElementById('btnGuardarParticipante').addEventListener('click', (e) => {
             e.preventDefault();
