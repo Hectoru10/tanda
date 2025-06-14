@@ -29,7 +29,7 @@ const tandaApp = {
 
         document.addEventListener("DOMContentLoaded", function() {
     grecaptcha.ready(function() {
-        grecaptcha.execute('TU_CLAVE_DEL_SITIO', {action: 'submit'}).then(function(token) {
+        grecaptcha.execute('6LfHkGArAAAAAIuz_p3FAa052G5WtnokurXSVZq8', {action: 'submit'}).then(function(token) {
             console.log("reCAPTCHA Token:", token);
         });
     });
