@@ -27,6 +27,15 @@ const tandaApp = {
             this.registrarTanda(e);
         });
 
+        document.addEventListener("DOMContentLoaded", function() {
+    grecaptcha.ready(function() {
+        grecaptcha.execute('TU_CLAVE_DEL_SITIO', {action: 'submit'}).then(function(token) {
+            console.log("reCAPTCHA Token:", token);
+        });
+    });
+});
+
+
         // Eventos de Participantes
         document.getElementById('btnGuardarParticipante').addEventListener('click', (e) => {
             e.preventDefault();
@@ -1088,13 +1097,6 @@ const tandaApp = {
         document.body.style.paddingRight = '';
     }
 };
-
-grecaptcha.ready(function() {
-    grecaptcha.execute('TU_CLAVE_DEL_SITIO', {action: 'submit'}).then(function(token) {
-        // Enviar el token al backend
-        console.log("reCAPTCHA Token:", token);
-    });
-});
 
 
 // Iniciar la aplicación cuando el DOM esté listo
